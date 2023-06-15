@@ -12,7 +12,7 @@ Age Prediction using [Fully Hyperbolic Neural Networks](https://arxiv.org/abs/21
 ```
 
 # Codes for Network Embedding
-The codes are based on [HGCN](https://github.com/HazyResearch/hgcn) repo. Codes related to our HyboNet are remarked below.
+The codes are based on [HGCN](https://github.com/HazyResearch/hgcn) repo. Codes related to HyboNet (FHNN) are remarked below.
 
 ```
 📦gcn
@@ -34,8 +34,8 @@ The codes are based on [HGCN](https://github.com/HazyResearch/hgcn) repo. Codes 
  ┣ 📂models
  ┃ ┣ 📜__init__.py
  ┃ ┣ 📜base_models.py
- ┃ ┣ 📜decoders.py      # Include our HyboNet decoder
- ┃ ┗ 📜encoders.py      # Include our HyboNet encoder
+ ┃ ┣ 📜decoders.py      # Include FHNN decoder
+ ┃ ┗ 📜encoders.py      # Include FHNN encoder
  ┣ 📂optim
  ┣ 📂utils
  ```
@@ -43,21 +43,21 @@ The codes are based on [HGCN](https://github.com/HazyResearch/hgcn) repo. Codes 
 ## 1. Usage
 Arguments passed to program:
 
-`--task` Specifies the task. Can be [lp, nc], lp denotes link prediction, and nc denotes node classification.
+`--task` Specifies task. Can be [lp], lp denotes link prediction.
 
-`--dataset` Specifies the dataset. Can be [airport, disease, cora, pubmed].
+`--dataset` Specifies dataset.
 
-`--lr` Specifies the learning rate.
+`--lr` Specifies learning rate.
 
-`--dim` Specifies the dimension of the embeddings.
+`--dim` Specifies dimension of embeddings.
 
-`--num-layers` Specifies the number of the layers.
+`--num-layers` Specifies number of layers.
 
 `--bias` To enable the bias, set it to 1.
 
-`--dropout` Specifies the dropout rate.
+`--dropout` Specifies dropout rate.
 
-`--weight-decay` Specifies the weight decay value.
+`--weight-decay` Specifies weight decay value.
 
 `--log-freq` Interval for logging.
 
