@@ -41,12 +41,7 @@ The codes are based on [HGCN](https://github.com/HazyResearch/hgcn) repo. Codes 
  ```
 
 ## 1. Usage
- The data is the same as those in [HGCN](https://github.com/HazyResearch/hgcn) repo. To run the experiments, simply download the datasets and put them in the `data` directory. Then run the corresponding training script, e.g.,
- ```bash
-bash run.airport.lp.sh
- ```
-
-Arguments that passed to program:
+Arguments passed to program:
 
 `--task` Specifies the task. Can be [lp, nc], lp denotes link prediction, and nc denotes node classification.
 
