@@ -1,3 +1,16 @@
+# Age Prediction through MEG Analysis using FHNN 
+Age Prediction using [Fully Hyperbolic Neural Networks](https://arxiv.org/abs/2105.14686) 
+
+```
+@article{chen2021fully,
+  title={Fully Hyperbolic Neural Networks},
+  author={Chen, Weize and Han, Xu and Lin, Yankai and Zhao, Hexu and Liu, Zhiyuan and Li, Peng and Sun, Maosong and Zhou, Jie},
+  journal={arXiv preprint arXiv:2105.14686},
+  year={2021}
+}
+{"mode":"full","isActive":false}
+```
+
 # Codes for Network Embedding
 The codes are based on [HGCN](https://github.com/HazyResearch/hgcn) repo. Codes related to our HyboNet are remarked below.
 
@@ -7,7 +20,7 @@ The codes are based on [HGCN](https://github.com/HazyResearch/hgcn) repo. Codes 
  ┣ 📂layers
  ┃ ┣ 📜__init__.py
  ┃ ┣ 📜att_layers.py
- ┃ ┣ 📜hyp_layers.py    # Defines our Lorentz graph convolutional layer
+ ┃ ┣ 📜hyp_layers.py    # Defines Lorentz Graph Convolutional Layer
  ┃ ┗ 📜layers.py
  ┣ 📂manifolds
  ┃ ┣ 📜__init__.py
@@ -33,7 +46,7 @@ The codes are based on [HGCN](https://github.com/HazyResearch/hgcn) repo. Codes 
 bash run.airport.lp.sh
  ```
 
- You can specify the arguments that are passed to the program:
+Arguments that passed to program:
 
 `--task` Specifies the task. Can be [lp, nc], lp denotes link prediction, and nc denotes node classification.
 
@@ -54,3 +67,24 @@ bash run.airport.lp.sh
 `--log-freq` Interval for logging.
 
 For other arguments, see `config.py`
+
+Example Run:
+
+! python train_graph_iteration.py \
+    --task lp \
+    --act None \
+    --dataset cam_can_multiple\
+    --model HyboNet \
+    --lr 0.05 \
+    --dim 3 \
+    --num-layers 2 \
+    --bias 1 \
+    --dropout 0.25 \
+    --weight-decay 1e-3 \
+    --manifold Lorentz \
+    --log-freq 5 \
+    --cuda -1 \
+    --patience 500 \
+    --grad-clip 0.1 \
+    --seed 1234 \
+    --save 1
