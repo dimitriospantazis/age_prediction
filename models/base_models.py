@@ -451,8 +451,6 @@ class LPModel(BaseModel):
         roc = float(self.epoch_stats['roc']) / self.epoch_stats['num_updates']
         loss = float(self.epoch_stats['loss']) / self.epoch_stats['num_updates']
         acc =  float(self.epoch_stats['acc']) / float(self.epoch_stats['num_updates'])
-        
-
         avg_stats = {
             'prefix': self.epoch_stats['prefix'],
             'epoch':  self.epoch_stats['epoch'],
@@ -461,8 +459,8 @@ class LPModel(BaseModel):
             'ap': precision,
             'acc': acc,
         }
-
-        stat_string = "%s Phase of Epoch %d: Precision %.6f, ROC %.6f, Loss %.6f, Accuracy %d, # Edges %d, # Graphs %d" % (
+        # FIXED ACCURACY PRINT ISSUE, WAS NOT 0, IT IS THE STAT STRING FORMATTING THAT zeros it out since it is a float between 0 and 1
+        stat_string = "%s Phase of Epoch %d: Precision %.6f, ROC %.6f, Loss %.6f, Accuracy %.6f, Edges %d, Graphs %d" % (
                 self.epoch_stats['prefix'],
                 self.epoch_stats['epoch'],
                 precision, 
@@ -580,4 +578,5 @@ class LPModel(BaseModel):
 
     def has_improved(self, m1, m2):
         return 0.5 * (m1['roc'] + m1['ap']) < 0.5 * (m2['roc'] + m2['ap'])
+
 
