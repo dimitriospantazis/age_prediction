@@ -76,7 +76,47 @@ def get_dir_name(models_dir):
         os.makedirs(save_dir)
     return save_dir
 
+def get_dir_name_for_age_prediction(models_dir):
+    """Checks the previously created directory to access it for Age Prediction.
 
+    If the directory already exists, then append a new integer to the end of
+    it. This method is useful so that we don't overwrite existing models
+    when launching new jobs.
+
+    Args:
+        models_dir: The directory where all the models are.
+
+    Returns:
+        The name of a new directory to save the training logs and model weights.
+    """
+    if not os.path.exists(models_dir):
+        save_dir = os.path.join(models_dir, '0')
+        os.makedirs(save_dir)
+    else:
+        existing_dirs = np.array(
+                [
+                    d
+                    for d in os.listdir(models_dir)
+                    if os.path.isdir(os.path.join(models_dir, d))
+                    ]
+        ).astype(np.int)
+        if len(existing_dirs) > 0:
+            dir_id = str(existing_dirs.max())
+        else:
+            raise AssertionError("No directory found for Age Prediction")
+        save_dir = os.path.join(models_dir, dir_id)
+    return save_dir
+
+
+def get_dir_name_for_hyperparameter_search(models_dir, args):
+    model_name = "fhnn_cam_can_multiple"
+    
+    path = f"{model_name}_lr_{args.lr}_act_{args.act}_drop_{args.dropout}_grad_{args.grad_clip}"
+    
+    path = os.path.join(models_dir, path)
+    # print("path", path)
+    os.makedirs(path)
+    return path 
 def add_flags_from_config(parser, config_dict):
     """
     Adds a flag (and default value) to an ArgumentParser for each parameter in a config

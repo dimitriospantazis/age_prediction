@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import sys
 my_path = 'C:\\Users\\dreww\\Desktop\\hyperbolic-learning\\utils' # path to utils.py 
 sys.path.append(my_path)
-from utils import *
+from hyperbolic_clustering.utils.utils import *
 
 #----------------------------------------------------------
 #----- Frechet Mean Optimization in Hyperboloid Model -----
@@ -30,6 +30,7 @@ def minkowski_loss_gradient(theta, X):
     grad_loss = 2*np.mean(distances*distance_grads, axis=0)
     if np.isnan(grad_loss).any():
         print('Hyperboloid dist returned nan value')
+        eps = 1e-6
         return eps
     else:
         return grad_loss

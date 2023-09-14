@@ -22,6 +22,10 @@ def get_dim_act_curv(args):
         act = getattr(F, args.act)
     acts = [act] * (args.num_layers - 1)
     dims = [args.feat_dim] + ([args.dim] * (args.num_layers - 1))
+    # TODO: Check how increasing hidden layer dimension affects performance! 362 -> 24 -> 3
+    HIDDEN_LAYER_DIM = 24
+    # HIDDEN_LAYER_DIM = 1024
+    dims[-1] = HIDDEN_LAYER_DIM
     if args.task in ['lp', 'rec']:
         dims += [args.dim]
         acts += [act]

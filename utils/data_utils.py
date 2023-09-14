@@ -9,21 +9,28 @@ import numpy as np
 import scipy.sparse as sp
 import torch
 
+
 THICK_INDEX = 0
 MYELIN_INDEX = 1
 TREE_DEPTH = 10
 THRESHOLD = 0.07
 NUM_ROIS = 360
 THRESHOLD_NEW = 0.23
-TRAIN_SPLIT, VAL_SPLIT, TEST_SPLIT = .6, .2, .2
+TRAIN_SPLIT, VAL_SPLIT, TEST_SPLIT = .7, .2, .1
+
+NUM_MEG_COLE_ROIS = 90
+MEG_PLV_METRIC_INDEX = 0
+MEG_BAND_ALPHA_INDEX = 1
+THRESHOLD_MEG = 0.329
+NUM_SBJS_MEG = 180
 
 TOTAL_SBJS = 592
-NUM_SBJS = TOTAL_SBJS - 5
+NUM_SBJS = TOTAL_SBJS - 5 # 587 subjects after filtering out numerically unstable PLV matrices
 # Remember that 5 subjects excluded due to filtering out Numerically Unstable PLV Matrices
 
 def load_data(args, datapath):
-    if args.dataset == 'cam_can_multiple' or args.dataset == 'binary_cyclic_tree_multiple':
-        data = load_data_lp(args.dataset, args.use_feats, datapath, args.use_super_node)
+    if args.dataset == 'cam_can_multiple' or args.dataset == 'binary_cyclic_tree_multiple' or args.dataset == 'meg':
+        data = load_data_lp(args.dataset, args.use_feats, datapath, args.use_super_node, args.use_thicks_myelins, threshold = args.threshold)
 
         for graph_data_dicts in data.values():
             for graph_data in graph_data_dicts:
@@ -48,7 +55,7 @@ def load_data(args, datapath):
         data = load_data_nc(args.dataset, args.use_feats, datapath, args.split_seed)
     
     else:
-        data = load_data_lp(args.dataset, args.use_feats, datapath, args.use_super_node)
+        data = load_data_lp(args.dataset, args.use_feats, datapath, args.use_super_node, threshold = args.threshold)
         
         adj = data['adj_train']
         if args.task == 'lp':
@@ -187,7 +194,7 @@ def add_super_node_to_adjacency_matrix(adj):
     adj_matrix[-1][-1] = 0
     return adj_matrix
 
-def load_data_lp(dataset, use_feats, data_path, use_super_node=False):
+def load_data_lp(dataset : str, use_feats : bool, data_path : str, use_super_node : bool =False, use_thicks_myelins : bool =True, threshold : float =1000.0):
     if dataset in ['cora', 'pubmed']:
         adj, features = load_citation_data(dataset, use_feats, data_path)[:2]
     elif dataset == 'disease_lp':
@@ -212,10 +219,47 @@ def load_data_lp(dataset, use_feats, data_path, use_super_node=False):
         if use_super_node: adj_mat = get_adjacency_matrix_for_binary_cyclic_tree_with_super_node(TREE_DEPTH)
         else: adj_mat = get_adjacency_matrix_for_binary_cyclic_tree(TREE_DEPTH) 
         adj, features = sp.csr_matrix(adj_mat), np.eye(len(adj_mat))
-        features = np.zeros((len(adj_mat), len(adj_mat)))
-        for i in range(len(features)):
-            features[i][0] = 1
-        print("CONVERTING INTO ZEROS", features)
+
+        def create_permutation(permutation_length):
+            permutation = []
+            seen = set()
+            for i in range(permutation_length):
+                if i == 0: num = np.random.randint(0, permutation_length)
+                while num in seen:
+                    num = np.random.randint(0, permutation_length)
+                seen.add(num)
+                permutation.append(num)
+            return permutation
+        def create_permutation_matrix(permutation):
+            n = len(permutation)
+            permutation_matrix = np.eye(n)
+            
+            # Rearrange rows/columns based on the permutation
+            for i in range(n):
+                j = permutation[i]
+                if i != j:
+                    permutation_matrix[[i, j]] = permutation_matrix[[j, i]]
+            
+            return permutation_matrix
+        use_permutation = False
+        if use_permutation:
+            permutation = create_permutation(len(adj_mat))
+            features = create_permutation_matrix(permutation)
+        use_random_noise = False
+        if use_random_noise:
+            print("USING RANDOM NOISE")
+            noise = np.random.normal(0, 0.01, (len(adj_mat), len(adj_mat)))
+            print("NOISE: ", noise)
+            features = features + noise
+        # Reverse Identity Matrix
+        # features = np.flipud(np.diag(np.ones(len(adj_mat))))
+        # features = np.eye(len(adj_mat))
+        # print("PERMUTATION FEATURES", permutation)
+        # print("PERMUTATION FEATURES", features[:5, :5])
+        import logging
+        logging.getLogger().setLevel(logging.INFO)
+        logging.info(f"Feature Matrix: {features}")
+        
     elif dataset == 'cam_can_avg':
         # ADJ MAT
         plv_tensor = np.load(os.path.join(data_path, "plv_tensor_276_sbj.npy"))
@@ -362,7 +406,7 @@ def load_data_lp(dataset, use_feats, data_path, use_super_node=False):
         
     elif dataset == 'cam_can_single_new':
         # ADJ MAT
-        subject_index = 0
+        subject_index = 100
         age_label = np.load(os.path.join(data_path, "age_labels_592_sbj_filtered.npy"))[subject_index]
         print(f"Subject Index : {subject_index}")
         print(f"Subject Age : {age_label}")
@@ -380,6 +424,8 @@ def load_data_lp(dataset, use_feats, data_path, use_super_node=False):
         
         # Thicks Myelins is 2 x 276 x 360
         # FEATURES 276 x 2 x 360
+        print("USING IDENTITY MATRIX")
+        use_feats = False
         if use_feats:
             thicks_myelins_tensor = np.load(os.path.join(data_path, "cam_can_thicks_myelins_tensor_592_filtered.npy")) # 276 as well  
             
@@ -407,13 +453,16 @@ def load_data_lp(dataset, use_feats, data_path, use_super_node=False):
             else: features = np.eye(NUM_ROIS)
         adj = sp.csr_matrix(adj_mat)
     elif dataset == 'cam_can_multiple':
-        train_graph_data_dicts, val_graph_data_dicts, test_graph_data_dicts = load_data_cam_can_new(NUM_SBJS, data_path)
+        train_graph_data_dicts, val_graph_data_dicts, test_graph_data_dicts = load_data_cam_can_new(threshold, NUM_SBJS, data_path, use_thicks_myelins, use_super_node)
+    elif dataset == 'meg':
+        
+        train_graph_data_dicts, val_graph_data_dicts, test_graph_data_dicts = load_data_meg(NUM_SBJS_MEG, data_path, use_thicks_myelins, use_super_node)
     elif dataset == 'binary_cyclic_tree_multiple':
         train_graph_data_dicts, val_graph_data_dicts, test_graph_data_dicts = load_data_binary_cyclic_tree_multiple(NUM_SBJS, data_path)
 
     else:
         raise FileNotFoundError('Dataset {} is not supported.'.format(dataset))
-    if dataset =='cam_can_multiple' or dataset == "binary_cyclic_tree_multiple":
+    if dataset =='cam_can_multiple' or dataset == "binary_cyclic_tree_multiple" or dataset == "meg":
         data = {'train_graph_data_dicts' : train_graph_data_dicts, 
                 'val_graph_data_dicts' : val_graph_data_dicts,
                 'test_graph_data_dicts'  : test_graph_data_dicts,
@@ -424,7 +473,7 @@ def load_data_lp(dataset, use_feats, data_path, use_super_node=False):
     
     return data
 
-def load_data_cam_can_new(num_sbjs, data_path):
+def load_data_cam_can_new(threshold : float, num_sbjs : int, data_path : str, use_thicks_myelins : bool, use_super_node : bool):
     # ADJ MAT
     # 360 x 360
     # FEATURES 592 x 2 x 360
@@ -444,7 +493,7 @@ def load_data_cam_can_new(num_sbjs, data_path):
         test_adj_matrices, 
         test_feats,
         test_age_labels,
-        test_split_indices] = get_adj_mat_dataset_splits_with_features_and_age_labels_and_indices(num_sbjs, data_path)
+        test_split_indices] = get_adj_mat_dataset_splits_with_features_and_age_labels_and_indices(threshold, num_sbjs, data_path, use_thicks_myelins, use_super_node)
     
     train_graph_data_dicts = [{'adj_train': sp.csr_matrix(train_adj), 
                                 'features': train_feat,
@@ -466,6 +515,51 @@ def load_data_cam_can_new(num_sbjs, data_path):
                                     in zip(test_adj_matrices, test_feats, test_age_labels, test_split_indices)]
 
     return train_graph_data_dicts, val_graph_data_dicts, test_graph_data_dicts
+
+def load_data_meg(num_sbjs : int, data_path : str, use_thicks_myelins : bool, use_super_node : bool):
+    # ADJ MAT
+    # 90 x 90
+    # FEATURES Identity Matrix
+    # Thicks Myelins is 2 x 592 x 360
+
+    # 360 x 2 n_nodes = 360 feat_dim = 2
+    # 360 x 362 n_nodes = 360 feat_dim = 362
+
+    [train_adj_matrices, 
+        train_feats, 
+        train_age_labels,
+        train_split_indices,
+        val_adj_matrices, 
+        val_feats,
+        val_age_labels,
+        val_split_indices, 
+        test_adj_matrices, 
+        test_feats,
+        test_age_labels,
+        test_split_indices] = get_adj_mat_dataset_splits_with_features_and_age_labels_and_indices_meg(num_sbjs, data_path, use_thicks_myelins, use_super_node)
+    
+    train_graph_data_dicts = [{'adj_train': sp.csr_matrix(train_adj), 
+                                'features': train_feat,
+                                'age_label': train_age_label,
+                                'index': train_split_index} 
+                                for train_adj, train_feat, train_age_label, train_split_index 
+                                    in zip(train_adj_matrices, train_feats, train_age_labels, train_split_indices)]
+    val_graph_data_dicts = [{'adj_train': sp.csr_matrix(val_adj), 
+                                'features': val_feat,
+                                'age_label': val_age_label,
+                                'index': val_split_index} 
+                                for val_adj, val_feat, val_age_label, val_split_index 
+                                    in zip(val_adj_matrices, val_feats, val_age_labels, val_split_indices)]
+    test_graph_data_dicts = [{'adj_train': sp.csr_matrix(test_adj), 
+                                'features': test_feat,
+                                'age_label': test_age_label,
+                                'index': test_split_index} 
+                                for test_adj, test_feat, test_age_label, test_split_index 
+                                    in zip(test_adj_matrices, test_feats, test_age_labels, test_split_indices)]
+
+    return train_graph_data_dicts, val_graph_data_dicts, test_graph_data_dicts
+
+
 
 def load_data_binary_cyclic_tree_multiple(num_sbjs, data_path):
     # ADJ MAT
@@ -545,15 +639,37 @@ def get_adjacency_matrix_for_binary_cyclic_tree_with_super_node(depth):
 def get_dataset_split_indices(num_sbjs) -> List[List[int]]:
     
     train_split_indices, val_split_indices, test_split_indices = [], [], []
+    import logging
+    # logging.info("Using Only 18 - 30 Age Range")
+    # logging.info("Using Only 18 - 30 Age Range")
+    nth_index = 0
+    nth_str = ["1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th"][nth_index]
+    # num_sbjs = 70
+    num_sbjs = NUM_SBJS
+    logging.info(f"Using Only {nth_str} {num_sbjs} Subjects")
+    # TODO: Change Back to 587
     train_num, val_num = int(num_sbjs * TRAIN_SPLIT), int(num_sbjs * VAL_SPLIT)
     test_num = num_sbjs - train_num - val_num 
+    # TODO: RESTORE BACK TO 100 % ONCE DONE TESTING SUBSET! 
+    # train_num = train_num // 10
+    # val_num = val_num // 10
+    # test_num = test_num // 10
     
+    # print("Using only one tenth of the data for training, validation and testing")
+    # print("Train Num: ", train_num)
+    # print("Val Num: ", val_num)
+    # print("Test Num: ", test_num)
+
     seen = set()
+    lower_bound = num_sbjs * nth_index
+    upper_bound = lower_bound + num_sbjs
+    # upper_bound = 587 # [490, 587) -> 97
     for split_indices, split_num in zip([train_split_indices, val_split_indices, test_split_indices],
                                     [train_num, val_num, test_num]):
         num_indices = 0
         while num_indices < split_num:
-            index = np.random.randint(0, num_sbjs) # Do not forget filtering! (subtract 5)        
+            # index = np.random.randint(0, num_sbjs) # Do not forget filtering! (subtract 5)        
+            index = np.random.randint(lower_bound, upper_bound) # Do not forget filtering! (subtract 5)        
             if index in seen: continue
             split_indices.append(index)
             num_indices += 1
@@ -564,17 +680,78 @@ def get_dataset_split_indices(num_sbjs) -> List[List[int]]:
     return train_split_indices, val_split_indices, test_split_indices
 
 
-def get_adjacency_matrix_cam_can(graph_index, data_path) -> List[List[int]]:
+def get_adjacency_matrix_cam_can(threshold : float, graph_index : int, data_path : str, use_super_node : bool = False) -> List[List[int]]:
     """
     Create adjacency matrix from threshold number by binarizing the float PLV matrix
     into a 1 and 0 matrix 
+
     """
     plv_tensor = np.load(os.path.join(data_path, "plv_tensor_592_sbj_filtered.npy"))
     plv_tensor = remove_self_loops(plv_tensor)
     plv_matrix = plv_tensor[graph_index].copy()
-    plv_matrix [plv_matrix < THRESHOLD_NEW] = 0
-    plv_matrix [plv_matrix >= THRESHOLD_NEW] = 1
+    import logging
+    # logging.info(f"USING HIGHEST HIDDEN LAYER YET 1024")
+    logging.info(f"Using PLV Threshold : {threshold}")
+    plv_matrix [plv_matrix < threshold] = 0
+    plv_matrix [plv_matrix >= threshold] = 1
     
+    # add_probability = 0.75    
+    # # logging.info(f"Hierarchy Test: With some probability p = {add_probability}, Add edges from ROI vectors that correspond to ACMP/DP")
+    # logging.info(f"Hierarchy Test: With some probability p = {add_probability}, Remove edges from ROI vectors that correspond to MT/LT")
+    # logging.info("PREVIOUS ADJACENCY MATRIX: \n {}".format(plv_matrix))
+    # ACMP_SUBNET_ID = 19
+    # DP_SUBNET_ID = 22
+    # MT_ID = 13
+    # LT_ID = 14
+    # from visualization import get_hcp_atlas_df
+    # hcp_atlas_df = get_hcp_atlas_df()
+    # cortex_ids = hcp_atlas_df['Cortex_ID']
+    # for i in range(NUM_ROIS):
+    #     if cortex_ids[i] == ACMP_SUBNET_ID:
+    #         # NOTE : Binarized matrix might already have 1's at [i][j]
+    #         for j in range(NUM_ROIS):
+    #             # if plv_matrix[i][j] == 1:
+    #             #     if np.random.uniform() < add_probability:
+    #             #         plv_matrix[i][j] = 0
+    #             #         plv_matrix[j][i] = 0    
+    #             if not plv_matrix[i][j]:
+    #                 if np.random.uniform() < add_probability:
+    #                     plv_matrix[i][j] = 1
+    #                     plv_matrix[j][i] = 1
+    # logging.info("ADJACENCY MATRIX AFTER ADDING: \n {}".format(plv_matrix))
+    if use_super_node:
+        logging.info("Using Super Node")
+        plv_matrix = np.insert(plv_matrix, 0, 1, axis = 0)
+        plv_matrix = np.insert(plv_matrix, 0, 1, axis = 1)
+        plv_matrix[-1] = [1] * len(plv_matrix)
+        for i in range(len(plv_matrix)):
+            plv_matrix[i][-1] = 1
+        plv_matrix[-1][-1] = 0
+
+    return plv_matrix
+
+
+def get_adjacency_matrix_meg(graph_index : int, data_path : str, use_super_node : bool = False) -> List[List[int]]:
+    """
+    Create adjacency matrix from threshold number by binarizing the float PLV matrix
+    into a 1 and 0 matrix 
+
+    """
+    plv_tensor = np.load(os.path.join(data_path, "MEG.ROIs.npy"))
+    # plv_tensor = remove_self_loops(plv_tensor)
+    plv_matrix = plv_tensor[graph_index][MEG_BAND_ALPHA_INDEX][MEG_PLV_METRIC_INDEX].copy()
+
+    plv_matrix [plv_matrix < THRESHOLD_MEG] = 0
+    plv_matrix [plv_matrix >= THRESHOLD_MEG] = 1
+    
+    if use_super_node:
+        plv_matrix = np.insert(plv_matrix, 0, 1, axis = 0)
+        plv_matrix = np.insert(plv_matrix, 0, 1, axis = 1)
+        plv_matrix[-1] = [1] * len(plv_matrix)
+        for i in range(len(plv_matrix)):
+            plv_matrix[i][-1] = 1
+        plv_matrix[-1][-1] = 0
+
     return plv_matrix
 
 def get_adj_mat_dataset_splits_with_features_and_age_labels_and_indices_for_binary_cyclic_tree_multiple(num_sbjs : int, data_path):
@@ -588,10 +765,25 @@ def get_adj_mat_dataset_splits_with_features_and_age_labels_and_indices_for_bina
     train_split_adj_matrices = [get_adjacency_matrix_for_binary_cyclic_tree(TREE_DEPTH) for i in train_split_indices]
     val_split_adj_matrices = [get_adjacency_matrix_for_binary_cyclic_tree(TREE_DEPTH) for i in val_split_indices]
     test_split_adj_matrices = [get_adjacency_matrix_for_binary_cyclic_tree(TREE_DEPTH) for i in test_split_indices]
-    
-    train_feats = [np.eye(len(train_split_adj_matrices[0])) + np.random.randn(len(train_split_adj_matrices[0]), len(train_split_adj_matrices[0])) for i in train_split_indices]
-    val_feats = [np.eye(len(train_split_adj_matrices[0])) + np.random.randn(len(train_split_adj_matrices[0]), len(train_split_adj_matrices[0])) for i in val_split_indices]
-    test_feats = [np.eye(len(train_split_adj_matrices[0])) + np.random.randn(len(train_split_adj_matrices[0]), len(train_split_adj_matrices[0])) for i in test_split_indices]
+    adj_mat = train_split_adj_matrices[0]
+    use_noise = False
+    if use_noise:
+        train_feats = [np.eye(len(train_split_adj_matrices[0])) + np.random.normal(0, 0.01, (len(adj_mat), len(adj_mat))) for i in train_split_indices]
+        val_feats = [np.eye(len(train_split_adj_matrices[0])) + np.random.normal(0, 0.01, (len(adj_mat), len(adj_mat))) for i in val_split_indices]
+        test_feats = [np.eye(len(train_split_adj_matrices[0])) + np.random.normal(0, 0.01, (len(adj_mat), len(adj_mat))) for i in test_split_indices]
+    else:
+        train_feats = [np.eye(len(train_split_adj_matrices[0])) for i in train_split_indices]
+        val_feats = [np.eye(len(train_split_adj_matrices[0])) for i in val_split_indices]
+        test_feats = [np.eye(len(train_split_adj_matrices[0])) for i in test_split_indices]
+
+    # if use_noise:
+    #     train_feats = [np.flipud(np.eye(len(train_split_adj_matrices[0]))) + np.random.normal(0, 0.01, (len(adj_mat), len(adj_mat))) for i in train_split_indices]
+    #     val_feats = [np.flipud(np.eye(len(train_split_adj_matrices[0]))) + np.random.normal(0, 0.01, (len(adj_mat), len(adj_mat))) for i in val_split_indices]
+    #     test_feats = [np.flipud(np.eye(len(train_split_adj_matrices[0]))) + np.random.normal(0, 0.01, (len(adj_mat), len(adj_mat))) for i in test_split_indices]
+    # else:
+    #     train_feats = [np.flipud(np.eye(len(train_split_adj_matrices[0]))) for i in train_split_indices]
+    #     val_feats = [np.flipud(np.eye(len(train_split_adj_matrices[0]))) for i in val_split_indices]
+    #     test_feats = [np.flipud(np.eye(len(train_split_adj_matrices[0]))) for i in test_split_indices]
 
     age_labels = np.load(os.path.join(data_path, "age_labels_592_sbj_filtered.npy"))
     train_age_labels = [age_labels[i] for i in train_split_indices]
@@ -612,22 +804,37 @@ def get_adj_mat_dataset_splits_with_features_and_age_labels_and_indices_for_bina
             test_split_indices]
 
 
-def get_adj_mat_dataset_splits_with_features_and_age_labels_and_indices(num_sbjs : int, data_path):
+def get_adj_mat_dataset_splits_with_features_and_age_labels_and_indices(threshold : float, num_sbjs : int, data_path : str, use_thicks_myelins : bool, use_super_node : bool):
     
     train_num, val_num = int(num_sbjs * TRAIN_SPLIT), int(num_sbjs * VAL_SPLIT)
     test_num = num_sbjs - train_num - val_num 
     assert train_num + val_num + test_num == num_sbjs, "Must add to total number of subjects"
-    # train_split_indices, val_split_indices, test_split_indices = get_dataset_split_indices(num_sbjs)
+    train_split_indices, val_split_indices, test_split_indices = get_dataset_split_indices(num_sbjs)
     # NOTE: Using subset of data for now to test and fix clumping issue, will use full dataset once clumping issue is fixed
-    train_split_indices, val_split_indices, test_split_indices = [0, 100, 200, 300, 400, 500], [50, 250, 450], [125, 525]
-
-    train_split_adj_matrices = [get_adjacency_matrix_cam_can(i, data_path) for i in train_split_indices]
-    val_split_adj_matrices = [get_adjacency_matrix_cam_can(i, data_path) for i in val_split_indices]
-    test_split_adj_matrices = [get_adjacency_matrix_cam_can(i, data_path) for i in test_split_indices]
+    # UPDATE: Seem to have fixed issue! Now using full dataset
+    # train_split_indices, val_split_indices, test_split_indices = [0, 100, 200, 300, 400, 500], [50, 250, 450], [125, 525]
+    # import logging
+    # logging.info("Using 5 Graphs")
+    # train_split_indices, val_split_indices, test_split_indices = [100, 100, 100, 100, 100], [100, 100, 100], [100, 100]
+    # train_split_indices, val_split_indices, test_split_indices = [100, 100, 100], [100], [100]
+    # train_split_indices, val_split_indices, test_split_indices = [0, 100, 200, 300, 400, 500], [50, 250, 450], [125, 525]
     
-    train_feats = [get_feature_matrix(i, data_path) for i in train_split_indices]
-    val_feats = [get_feature_matrix(i, data_path) for i in val_split_indices]
-    test_feats = [get_feature_matrix(i, data_path) for i in test_split_indices]
+
+    # TODO: Remove this once hierarchy testing is complete!
+    # Must ensure same adjacency matrix with additional edges fed into model for each split to test hierarchy changes
+    # logging.info("Using same adjacency matrix to test Hierarchy Changes!")
+    # adjacency_matrix = get_adjacency_matrix_cam_can(100, data_path, use_super_node)
+    # train_split_adj_matrices = [adjacency_matrix for _ in train_split_indices]
+    # val_split_adj_matrices = [adjacency_matrix for _ in val_split_indices]
+    # test_split_adj_matrices = [adjacency_matrix for _ in test_split_indices]
+
+    train_split_adj_matrices = [get_adjacency_matrix_cam_can(threshold, i, data_path, use_super_node) for i in train_split_indices]
+    val_split_adj_matrices = [get_adjacency_matrix_cam_can(threshold, i, data_path, use_super_node) for i in val_split_indices]
+    test_split_adj_matrices = [get_adjacency_matrix_cam_can(threshold, i, data_path, use_super_node) for i in test_split_indices]
+    
+    train_feats = [get_feature_matrix(i, data_path, use_thicks_myelins, use_super_node) for i in train_split_indices]
+    val_feats = [get_feature_matrix(i, data_path, use_thicks_myelins, use_super_node) for i in val_split_indices]
+    test_feats = [get_feature_matrix(i, data_path, use_thicks_myelins, use_super_node) for i in test_split_indices]
 
     age_labels = np.load(os.path.join(data_path, "age_labels_592_sbj_filtered.npy"))
     train_age_labels = [age_labels[i] for i in train_split_indices]
@@ -646,6 +853,56 @@ def get_adj_mat_dataset_splits_with_features_and_age_labels_and_indices(num_sbjs
             test_feats, 
             test_age_labels,
             test_split_indices]
+
+def get_adj_mat_dataset_splits_with_features_and_age_labels_and_indices_meg(num_sbjs : int, data_path : str, use_thicks_myelins : bool, use_super_node : bool):
+    
+    train_num, val_num = int(num_sbjs * TRAIN_SPLIT), int(num_sbjs * VAL_SPLIT)
+    test_num = num_sbjs - train_num - val_num 
+    assert train_num + val_num + test_num == num_sbjs, "Must add to total number of subjects"
+    train_split_indices, val_split_indices, test_split_indices = get_dataset_split_indices(num_sbjs)
+    # NOTE: Using subset of data for now to test and fix clumping issue, will use full dataset once clumping issue is fixed
+    # UPDATE: Seem to have fixed issue! Now using full dataset
+    # train_split_indices, val_split_indices, test_split_indices = [0, 100, 200, 300, 400, 500], [50, 250, 450], [125, 525]
+    # import logging
+    # logging.info("Using 5 Graphs")
+    # train_split_indices, val_split_indices, test_split_indices = [100, 100, 100, 100, 100], [100, 100, 100], [100, 100]
+    # train_split_indices, val_split_indices, test_split_indices = [100, 100, 100], [100], [100]
+    # train_split_indices, val_split_indices, test_split_indices = [0, 100, 200, 300, 400, 500], [50, 250, 450], [125, 525]
+    
+    # TODO: Remove this once hierarchy testing is complete!
+    # Must ensure same adjacency matrix with additional edges fed into model for each split to test hierarchy changes
+    # logging.info("Using same adjacency matrix to test Hierarchy Changes!")
+    # adjacency_matrix = get_adjacency_matrix_cam_can(100, data_path, use_super_node)
+    # train_split_adj_matrices = [adjacency_matrix for _ in train_split_indices]
+    # val_split_adj_matrices = [adjacency_matrix for _ in val_split_indices]
+    # test_split_adj_matrices = [adjacency_matrix for _ in test_split_indices]
+
+    train_split_adj_matrices = [get_adjacency_matrix_meg(i, data_path, use_super_node) for i in train_split_indices]
+    val_split_adj_matrices = [get_adjacency_matrix_meg(i, data_path, use_super_node) for i in val_split_indices]
+    test_split_adj_matrices = [get_adjacency_matrix_meg(i, data_path, use_super_node) for i in test_split_indices]
+    
+    train_feats = [np.eye(NUM_MEG_COLE_ROIS) for _ in train_split_indices]
+    val_feats = [np.eye(NUM_MEG_COLE_ROIS) for _ in val_split_indices]
+    test_feats = [np.eye(NUM_MEG_COLE_ROIS) for _ in test_split_indices]
+
+    age_labels = np.load(os.path.join(data_path, "MEG_age_labels_180.npy"))
+    train_age_labels = [age_labels[i] for i in train_split_indices]
+    val_age_labels = [age_labels[i] for i in val_split_indices]
+    test_age_labels = [age_labels[i] for i in test_split_indices]
+
+    return [train_split_adj_matrices, 
+            train_feats, 
+            train_age_labels,
+            train_split_indices, 
+            val_split_adj_matrices, 
+            val_feats, 
+            val_age_labels,
+            val_split_indices,
+            test_split_adj_matrices, 
+            test_feats, 
+            test_age_labels,
+            test_split_indices]
+
 
 def remove_self_loops(plv_tensor):
     for sbj_index in range(len(plv_tensor)):
@@ -653,7 +910,7 @@ def remove_self_loops(plv_tensor):
             plv_tensor[sbj_index][i][i] = 0
     return plv_tensor
 
-def get_feature_matrix(graph_index, data_path):
+def get_feature_matrix(graph_index : int, data_path : str, use_thicks_myelins : bool = True, use_super_node : bool = False):
     """
     Feature Matrix for specific subject if 360 x 362 since PLV_vectors are 360
     [CT_0   Myelin_0      PLV_vector_0.T      ]
@@ -681,24 +938,90 @@ def get_feature_matrix(graph_index, data_path):
     use_min_max_scaler = True
     use_z_score_normalization = False
     if use_min_max_scaler:
+        # TODO: PLOT THE MIN MAX NORMALIZED FEATURES FOR EACH SUBJECT
         thick_features = min_max_normalize(thick_features)
         myelin_features = min_max_normalize(myelin_features)    
         plv_features = min_max_normalize(plv_features)
     if use_z_score_normalization:
         thick_features = z_score_normalize(thick_features)
         myelin_features = z_score_normalize(myelin_features)
-    use_thicks_myelins = True
-    if use_thicks_myelins:
-        feature_matrix = np.hstack((thick_features, myelin_features, plv_features))
-    else:
-        feature_matrix = plv_features
+    # TODO: Make these more notorious! Can lead to confusion with results 
+    # from not remembering that these are activated and therefore not using 
+    # all features inadvertently!
     import logging
     logging.getLogger().setLevel(logging.INFO)
-    logging.info(f"Feature Matrix: {feature_matrix}")
+    
+    # logging.info("Using Myelination + PLV Matrix")
+    # feature_matrix = np.hstack((myelin_features, plv_features))
+    use_only_thicks = True
+    use_only_myelins = False
+    if use_only_thicks:
+        logging.info("Using CT + Identity Feature Matrix")
+        feature_matrix = np.hstack((thick_features, np.eye(NUM_ROIS)))
+    elif use_only_myelins:
+        logging.info("Using Myelination + Identity Feature Matrix")
+        feature_matrix = np.hstack((myelin_features, np.eye(NUM_ROIS)))
+    elif use_thicks_myelins:
+        logging.info("Using Myelination + PLV + CT Feature Matrix")
+        feature_matrix = np.hstack((myelin_features, plv_features, thick_features))
+        # logging.info("Using CT + Myelination + PLV  Feature Matrix")
+        # feature_matrix = np.hstack((thick_features, myelin_features, plv_features))
+    else:
+        logging.info("Using PLV Feature Matrix only")
+        # logging.info("Added Identity Matrix to Feature Matrix!")
+        # feature_matrix = np.hstack((plv_features, np.eye(NUM_ROIS)))
+        feature_matrix = plv_features
+    # TODO: Change back to correct feature matrix
+    # logging.info("Using CT + Myelination + Identity Feature Matrix")
+    # feature_matrix = np.hstack((thick_features, myelin_features, np.eye(NUM_ROIS)))
+    logging.info(f"Use Super Node : {use_super_node}")
+    if use_super_node:
+        # feature_matrix = np.eye(NUM_ROIS + 1)
+        num_rows, num_cols = feature_matrix.shape
 
+        # Create a new matrix with an extra row and an extra column
+        new_matrix = np.zeros((num_rows + 1, num_cols + 1), dtype=feature_matrix.dtype)
+
+        # Copy the elements from the original matrix to the new matrix
+        new_matrix[ : num_rows, : num_cols] = feature_matrix
+
+        # Set the bottom-right corner to 1
+        new_matrix[num_rows, num_cols] = 1
+        feature_matrix = new_matrix
+    # use_adj_matrix_powers = False
+    # def get_adjacency_matrix_powers():
+    #     adj_mat = get_adjacency_matrix_cam_can(graph_index, data_path)
+    #     shrink_factor = 0.4
+    #     return np.linalg.inv(np.eye(NUM_ROIS) - shrink_factor * adj_mat)
+
+    # if use_adj_matrix_powers:
+    #     logging.info("Using Adjacency Matrix Powers")
+
+    #     adj_mat_pow = get_adjacency_matrix_powers()
+    #     logging.info("Adj Mat Powers: {}".format(adj_mat_pow))
+    #     feature_matrix = np.hstack((thick_features, myelin_features, adj_mat_pow))
+        
+    # else:
+    #     feature_matrix = np.hstack((thick_features, myelin_features, np.eye(NUM_ROIS)))
+
+    # TODO: Check how CT + Identity changes if we don't use random noise
+    use_noise = False
+    if use_noise:
+        feature_matrix += np.random.normal(0, 0.01, size=feature_matrix.shape)
+    # if use_min_max_scaler:
+    #     feature_matrix = min_max_normalize(feature_matrix)
+    logging.info(f"Feature Matrix with No Noise: {feature_matrix}")
     return feature_matrix
 
+def get_thick_features(graph_index : int, data_path : str):
+    thicks_myelins_tensor = np.load(os.path.join(data_path, "cam_can_thicks_myelins_tensor_592_filtered.npy"))
+    thick_features = thicks_myelins_tensor[THICK_INDEX][graph_index]
+    return thick_features
 
+def get_myelin_features(graph_index : int, data_path : str):
+    thicks_myelins_tensor = np.load(os.path.join(data_path, "cam_can_thicks_myelins_tensor_592_filtered.npy"))
+    myelin_features = thicks_myelins_tensor[MYELIN_INDEX][graph_index] 
+    return myelin_features
 # ############### NODE CLASSIFICATION DATA LOADERS ####################################
 
 

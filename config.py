@@ -4,10 +4,15 @@ from utils.train_utils import add_flags_from_config
 
 config_args = {
     'training_config': {
+        'threshold': (0.23, 'PLV matrix to binary adjacency matrix threshold'),
         'lr': (0.01, 'learning rate'),
         'dropout': (0.0, 'dropout probability'),
         'cuda': (-1, 'which cuda device to use (-1 for cpu training)'),
-        'epochs': (5000, 'maximum number of epochs to train for'),
+        # 'epochs': (150, 'maximum number of epochs to train for'),
+        'epochs': (300, 'maximum number of epochs to train for'),
+        # 'epochs': (500, 'maximum number of epochs to train for'),
+        # 'epochs': (1000, 'maximum number of epochs to train for'),
+        # 'epochs': (5000, 'maximum number of epochs to train for'),
         'weight-decay': (0., 'l2 regularization strength'),
         'optimizer': ('radam', 'which optimizer to use, can be any of [rsgd, radam]'),
         'momentum': (0.999, 'momentum in optimizer'),
@@ -19,7 +24,9 @@ config_args = {
         'save-dir': (None, 'path to save training logs and model weights (defaults to logs/task/date/run/)'),
         'sweep-c': (0, ''),
         'lr-reduce-freq': (None, 'reduce lr every lr-reduce-freq or None to keep lr constant'),
+        # 'lr-reduce-freq': (20, 'reduce lr every lr-reduce-freq or None to keep lr constant'),
         'gamma': (0.5, 'gamma for lr scheduler'),
+        # 'gamma': (0.9, 'gamma for lr scheduler'),
         'print-epoch': (True, ''),
         'grad-clip': (None, 'max norm for gradient clipping, or None for no gradient clipping'),
         'min-epochs': (100, 'do not early stop before min-epochs')
@@ -49,8 +56,10 @@ config_args = {
         'val-prop': (0.05, 'proportion of validation edges for link prediction'),
         'test-prop': (0.1, 'proportion of test edges for link prediction'),
         'use-feats': (1, 'whether to use node features or not'),
+        # 'normalize-feats': (0, 'whether to normalize input node features'),
         'normalize-feats': (1, 'whether to normalize input node features'),
         'normalize-adj': (1, 'whether to row-normalize the adjacency matrix'),
+        # 'normalize-adj': (0, 'whether to row-normalize the adjacency matrix'),
         'split-seed': (1234, 'seed for data splits (train/test/val)'),
     }
 }

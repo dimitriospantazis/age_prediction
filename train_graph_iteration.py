@@ -18,7 +18,7 @@ from models.base_models import NCModel, LPModel
 from optim.radam import RiemannianAdam
 from optim.rsgd import RiemannianSGD
 from utils.data_utils import load_data
-from utils.train_utils import get_dir_name, format_metrics
+from utils.train_utils import get_dir_name, format_metrics, get_dir_name_for_hyperparameter_search, get_dir_name_for_age_prediction
 # FHNN does not use Frechet Mean calculation since it is still slow
 # from diff_frech_mean.frechet_agg import frechet_B
 import copy
@@ -28,6 +28,7 @@ from utils.eval_utils import acc_f1
 
 DATAPATH = os.path.join(os.getcwd(), "data")
 LOG_DIR = os.path.join(os.getcwd(), "logs")
+BATCH_SIZE = 64
 os.environ['DATAPATH'] = DATAPATH
 os.environ['LOG_DIR'] = LOG_DIR
 
@@ -47,6 +48,7 @@ def train(args):
             date = f"{dt.year}_{dt.month}_{dt.day}"
             models_dir = os.path.join(os.environ['LOG_DIR'], args.task, date)
             save_dir = get_dir_name(models_dir)
+            # save_dir = get_dir_name_for_hyperparameter_search(models_dir, args)
         else:
             save_dir = args.save_dir
         logging.basicConfig(level=logging.INFO,
@@ -59,13 +61,21 @@ def train(args):
     logging.info("Using seed {}.".format(args.seed))
 
     # Load data
-    # TODO: Check how using supernode changes CAMCAN AVG results
+    # TODO: Check how using supernode changes FULL 592 CAMCAN results : NOTE: Does not change much
     args.use_super_node = False
+    args.use_thicks_myelins = False
+    args.use_margin_loss = True
+    args.use_batch_learning = True
+    logging.info("Use Super Node : {}".format(args.use_super_node))
+    logging.info("Use Batch Learning : {}".format(args.use_batch_learning))
+    logging.info("Use Margin Loss : {}".format(args.use_margin_loss))
+    logging.info("Use CT + Myelination : {}".format(args.use_thicks_myelins))
+    logging.info("Step Size for Reduction Factor (Gamma) for learning rate : {}".format(args.lr_reduce_freq))
+    logging.info("Reduction Factor (Gamma) for learning rate : {}".format(args.gamma))
     data = load_data(args, os.path.join(os.environ['DATAPATH'], args.dataset))
     
     train_graph_data_dicts, val_graph_data_dicts, test_graph_data_dicts = \
         data["train_graph_data_dicts"], data["val_graph_data_dicts"], data["test_graph_data_dicts"]
-
 
     train_feat_0 = train_graph_data_dicts[0]['features']
 
@@ -169,53 +179,49 @@ def train(args):
     if hasattr(args_to_save,'change_threshold'): setattr(args_to_save,'change_threshold','Cannot serialize function')
 
     args.frech_B_dict = dict()
+    
+    logging.info(f"Max Number of Epochs : {args.epochs}")
     for epoch in range(args.epochs): 
         # logging.info(f"Model Curvature: {model.c[0]}")
         model.train()
     
         t = time.time()
-        train_embeddings_list = []
-        for train_graph_data in train_graph_data_dicts:
-            optimizer.zero_grad()
+        
+        if args.use_batch_learning:
+            train_embeddings_list = batch_learning(model, train_graph_data_dicts, optimizer, lr_scheduler, args)
+        else:
+            train_embeddings_list = []
+            for train_graph_data in train_graph_data_dicts:
+                # TODO: Figure out if zero gradient should happen here or at the beginning of the for train_graph_data for loop
+                optimizer.zero_grad() 
 
-            # for key in train_graph_data:
-            #     if torch.is_tensor(train_graph_data[key]):
-            #         train_graph_data[key] = train_graph_data[key].to(args.device)
-            
-            # for i in range(batch_size):            
-            #     train_graph_data = train_graph_data_dicts[i]
-                # TODO: Move to load_data method
-                # data_i = dict()
-                # for k, vals in data.items():
-                #     data_i[k] = vals[i]
-                #     if torch.is_tensor(data_i[k]):
-                #         data_i[k] = data_i[k].to(model.args.device)
-                
-                # data_i['adj_mat'] = data_i['adj_mat'].to_sparse()
-                # data_i['adj_train_norm'] = data_i['adj_mat']
-                
-                # edges_false_dict ={'train':{}}
-                # split='train'
-                # data_i['false_dict'] = edges_false_dict[split]
-            
-            # Frechet Mean Aggregation Layer Memoizations:
-            # Memoization to speed up training
-            # if train_graph_data['index'] in model.args.frech_B_dict:
-                
-            #     model.args.frechet_B = model.args.frech_B_dict[train_graph_data['index']]
-            # # elif model.args.use_virtual:
-            # #     model.args.frechet_B=361
-            # else:
-            #     model.args.frechet_B = frechet_B(train_graph_data['adj_train_norm'])
-                
-            #     model.args.frech_B_dict[train_graph_data['index']] = model.args.frechet_B
+                # Frechet Mean Aggregation Layer Memoizations:
+                # Memoization to speed up training
+                # if train_graph_data['index'] in model.args.frech_B_dict:
+                    
+                #     model.args.frechet_B = model.args.frech_B_dict[train_graph_data['index']]
+                # # elif model.args.use_virtual:
+                # #     model.args.frechet_B=361
+                # else:
+                #     model.args.frechet_B = frechet_B(train_graph_data['adj_train_norm'])
+                    
+                #     model.args.frech_B_dict[train_graph_data['index']] = model.args.frechet_B
 
-            embeddings = model.encode(
-                train_graph_data['features'].to(args.device), 
-                train_graph_data['adj_train_norm'].to(args.device),
+                embeddings = model.encode(
+                    train_graph_data['features'].to(args.device), 
+                    train_graph_data['adj_train_norm'].to(args.device),
+                    )
+                
+                train_embeddings_list.append(embeddings)
+            # TODO: Make sure loss and gradient descent is done 
+            # properly, so that the gradient is updated after running
+            # all graphs in the batch
+            train_metrics = model.compute_metrics_multiple(
+                train_embeddings_list,
+                train_graph_data_dicts,
+                'train'
                 )
-            print("EMBEDDINGS!!!", embeddings)
-            train_embeddings_list.append(embeddings)
+            train_metrics['loss'].backward()
 
             if model.c < 0.1:
                 logging.info(f'Low Curvature: {model.c}')
@@ -229,73 +235,50 @@ def train(args):
                 all_params = list(model.parameters())
                 for param in all_params:
                     torch.nn.utils.clip_grad_norm_(param, max_norm)
-        
-        # TODO: Make sure loss and gradient descent is done 
-        # properly, so that the gradient is updated after running
-        # all graphs in the batch
-        train_metrics = model.compute_metrics_multiple(
-            train_embeddings_list,
-            train_graph_data_dicts,
-            'train'
-            )
-        train_metrics['loss'].backward()
-
-        optimizer.step()
+            optimizer.step()
             
-        model.update_epoch_stats(train_metrics, 'train')         
-        
-        if (epoch + 1) % args.log_freq == 0:        
-            logging.info(" ".join(['Epoch: {:04d}'.format(epoch + 1),
-                                   'lr: {}'.format(lr_scheduler.get_last_lr()[0]),
-                                   'time: {:.4f}s'.format(time.time() - t)
-                                   ]))
-        val_embeddings_list = []
-        test_embeddings_list = []
-        # Evaluation Epoch :
-        # Consider making evalutation epoch take place less frequently
-        # args.eval_freq = 10 
-        if (epoch + 1) % args.eval_freq == 0:
-            epoch_time = int(time.time() - t)
-            logging.info(f'Training Epoch Time : {epoch_time} seconds')
-            
-            val_metrics, val_embeddings, val_string, val_embeddings_list = model.evaluate_graph_data_dicts(epoch, 
-                                                            val_graph_data_dicts, 
-                                                            'val', 
-                                                            freeze=True)
-            test_metrics, test_embeddings, test_string, test_embeddings_list = model.evaluate_graph_data_dicts(epoch, 
-                                                                test_graph_data_dicts, 
-                                                                'test', 
-                                                                freeze=False)
-            logging.info(" ".join(['Val','Epoch: {:04d}'.format(epoch + 1), val_string]))
-            logging.info(" ".join(['Test','Epoch: {:04d}'.format(epoch + 1), test_string]))
-            if model.has_improved(best_val_metrics, val_metrics):
-                best_test_metrics = test_metrics
-                best_test_string = test_string
-                best_emb = val_embeddings.cpu()
-                if args.save:
-                    # TODO: Check if avoiding constant saving saves time!
-                    # np.save(os.path.join(save_dir, 'eval_embeddings.npy'), best_emb.detach().cpu().numpy())
-                    
-                    # if hasattr(model.encoder, 'att_adj'):
-                    #     filename = os.path.join(save_dir, args.dataset + '_att_adj.p')
-                    #     pickle.dump(model.encoder.att_adj.cpu().to_dense(), open(filename, 'wb'))
-                    #     print('Dumped attention adj: ' + filename)
-
-
-                    # json.dump(vars(args_to_save), open(os.path.join(save_dir, 'config.json'), 'w'))
-                    # torch.save(model.state_dict(), os.path.join(save_dir, 'model_state.pth'))
-                    # torch.save(model, os.path.join(save_dir, 'model.pt'))
-                    # logging.info(f"Saved model in {save_dir}")
-                    pass
-                best_val_metrics = val_metrics
-                best_val_string = val_string
-                counter = 0
-            else:
-                counter += 1
-                if counter == args.patience and epoch > args.min_epochs:
-                    logging.info("Early stopping")
-                    break
-
+            model.update_epoch_stats(train_metrics, 'train')         
+        with torch.no_grad():
+            if (epoch + 1) % args.log_freq == 0:        
+                logging.info(" ".join(['Epoch: {:04d}'.format(epoch + 1),
+                                    'lr: {}'.format(lr_scheduler.get_last_lr()[0]),
+                                    'time: {:.4f}s'.format(time.time() - t)
+                                    ]))
+            val_embeddings_list = []
+            test_embeddings_list = []
+            # Evaluation Epoch :
+            # Consider making evaluation epoch take place less frequently
+            # args.eval_freq = 10 
+            if (epoch + 1) % args.eval_freq == 0:
+                epoch_time = int(time.time() - t)
+                logging.info(f'Training Epoch Time : {epoch_time} seconds')
+                
+                val_metrics, val_embeddings, val_string, val_embeddings_list = model.evaluate_graph_data_dicts(epoch, 
+                                                                val_graph_data_dicts, 
+                                                                'val', 
+                                                                freeze=True)
+                test_metrics, test_embeddings, test_string, test_embeddings_list = model.evaluate_graph_data_dicts(epoch, 
+                                                                    test_graph_data_dicts, 
+                                                                    'test', 
+                                                                    freeze=False)
+                logging.info(" ".join(['Val','Epoch: {:04d}'.format(epoch + 1), val_string]))
+                logging.info(" ".join(['Test','Epoch: {:04d}'.format(epoch + 1), test_string]))
+                if model.has_improved(best_val_metrics, val_metrics):
+                    best_test_metrics = test_metrics
+                    best_test_string = test_string
+                    best_emb = val_embeddings.cpu()
+                    if args.save:
+                        # TODO: Check if avoiding constant saving saves time!
+                        # np.save(os.path.join(save_dir, 'eval_embeddings.npy'), best_emb.detach().cpu().numpy())
+                        pass
+                    best_val_metrics = val_metrics
+                    best_val_string = val_string
+                    counter = 0
+                else:
+                    counter += 1
+                    if counter == args.patience and epoch > args.min_epochs:
+                        logging.info("Early stopping")
+                        break
         lr_scheduler.step()
         # torch.cuda.empty_cache()
     
@@ -326,9 +309,10 @@ def train(args):
         save_embeddings_list(val_embeddings_list, val_graph_data_dicts, save_dir, 'val')
         save_embeddings_list(test_embeddings_list, test_graph_data_dicts, save_dir, 'test')
         
-        pickle.dump(train_graph_data_dicts, open(os.path.join(save_dir, 'train_graph_data_dicts.pkl'), 'wb'))
-        pickle.dump(val_graph_data_dicts, open(os.path.join(save_dir, 'val_graph_data_dicts.pkl'), 'wb'))
-        pickle.dump(test_graph_data_dicts, open(os.path.join(save_dir, 'test_graph_data_dicts.pkl'), 'wb'))
+        # TODO: See if need to save train, val, test graph data dicts or if they are not needed
+        # pickle.dump(train_graph_data_dicts, open(os.path.join(save_dir, 'train_graph_data_dicts.pkl'), 'wb'))
+        # pickle.dump(val_graph_data_dicts, open(os.path.join(save_dir, 'val_graph_data_dicts.pkl'), 'wb'))
+        # pickle.dump(test_graph_data_dicts, open(os.path.join(save_dir, 'test_graph_data_dicts.pkl'), 'wb'))
 
         
     return best_val_metrics['loss']
@@ -398,6 +382,81 @@ def run_data_single(data, index, model, skip_embedding=False, no_grad=False):
     
     return embeddings, data_i
 
+def batch_learning(model, train_graph_data_dicts, optimizer, lr_scheduler, args):
+    # batch_size = 64
+    # num_epochs = 500
+    # learning_rate = 0.001
+    
+    train_embeddings_list = []
+    
+    # torch.randperm(num_samples)
+    # NOTE: No need to re-randomize, will only lose track of the indices since we already have the randomized train_graph_data_dicts 
+    
+    for i in range(0, len(train_graph_data_dicts), BATCH_SIZE):
+        mini_batch_data = train_graph_data_dicts[i : i + BATCH_SIZE]
+        batch_embeddings_list = []
+        for batch_graph_data in mini_batch_data:
+            embeddings = model.encode(batch_graph_data['features'].to(args.device),
+                                    batch_graph_data['adj_train_norm'].to(args.device)
+                        )
+            batch_embeddings_list.append(embeddings)
+            train_embeddings_list.append(embeddings)
+        
+        # TODO: Make sure loss and gradient descent is done 
+        # properly, so that the gradient is updated after running
+        # all graphs in the batch
+        train_metrics = model.compute_metrics_multiple(
+            batch_embeddings_list,
+            mini_batch_data,
+            'train'
+            )
+        
+        train_metrics['loss'].backward()
+        # Difference between above, and model.backward(train_metrics['loss'])
+        # model.accumulate_gradients()
+
+        optimizer.step()
+        lr_scheduler.step()
+        optimizer.zero_grad()
+        model.update_epoch_stats(train_metrics, 'train')
+
+    return train_embeddings_list
+
 if __name__ == '__main__':
     args = parser.parse_args()
     train(args)
+    logging.info("Training Complete!")
+    logging.info("Starting Age Prediction Regression")
+    from age_predictor import Age_Predictor
+    dt = datetime.datetime.now()
+    date = f"{dt.year}_{dt.month}_{dt.day}"
+    models_dir = os.path.join(os.environ['LOG_DIR'], args.task, date)
+    save_dir = get_dir_name_for_age_prediction(models_dir)
+    log_num = save_dir.split("\\")[-1]
+    linear_age_predictor = Age_Predictor(date, log_num, "linear", "HR", "Cam-CAN")
+    ridge_age_predictor = Age_Predictor(date, log_num, "ridge", "HR", "Cam-CAN")
+    linear_mean_squared_error, linear_correlation = linear_age_predictor.regression()
+    ridge_mean_squared_error, ridge_correlation = ridge_age_predictor.regression()
+    logging.info(f"Linear Model Age Prediction MSE : {linear_mean_squared_error}")
+    logging.info(f"Linear Model Age Prediction Correlation : {linear_correlation}")
+    logging.info(f"Ridge Model Age Prediction MSE : {ridge_mean_squared_error}")
+    logging.info(f"Ridge Model Age Prediction Correlation : {ridge_correlation}")
+    
+    #     if torch.is_tensor(train_graph_data[key]):
+    #         train_graph_data[key] = train_graph_data[key].to(args.device)
+    
+    # for i in range(batch_size):            
+    #     train_graph_data = train_graph_data_dicts[i]
+        # TODO: Move to load_data method
+        # data_i = dict()
+        # for k, vals in data.items():
+        #     data_i[k] = vals[i]
+        #     if torch.is_tensor(data_i[k]):
+        #         data_i[k] = data_i[k].to(model.args.device)
+        
+        # data_i['adj_mat'] = data_i['adj_mat'].to_sparse()
+        # data_i['adj_train_norm'] = data_i['adj_mat']
+        
+        # edges_false_dict ={'train':{}}
+        # split='train'
+        # data_i['false_dict'] = edges_false_dict[split]

@@ -105,13 +105,14 @@ class LPModel(BaseModel):
     def __init__(self, args):
         super(LPModel, self).__init__(args)
         self.dc = FermiDiracDecoder(r=args.r, t=args.t)
+        self.args = args
         self.nb_false_edges = args.nb_false_edges
         self.nb_edges = args.nb_edges
-        self.loss = MarginLoss(args.margin)
+        # self.loss = MarginLoss(args.margin)
+        self.loss = MarginLoss(args.margin) + nn.MSELoss(reduction='sum')
         
         # Cole added
-        self.is_inductive = True
-        self.args = args
+        self.is_inductive = True # Makes sense since Cole called the file train_inductive.py
         self.epoch_stats = {
             'prefix': 'start',
             'epoch': -1,
@@ -134,12 +135,15 @@ class LPModel(BaseModel):
         emb_in = h[idx[:, 0], :]
         emb_out = h[idx[:, 1], :]
         sqdist = self.manifold.sqdist(emb_in, emb_out, self.c)
-        return -sqdist
+        # TODO: RESTORE TO NON FD FHNN with -sqdist
+        # Fermi Dirac Decoder Probabilities from HGCN
+        return self.dc.forward(sqdist)
+        # return -sqdist
+    
     def get_avg_hyperbolic_radius(self, embeddings):
         origin = torch.Tensor([1, 0, 0]) # .to(self.args.device)
         avg_radius = 0
         for embedding_coords in embeddings:
-            # hyperbolic_radius = self.manifold.sqdist(embedding_coords, origin, k = 1.0)
             hyperbolic_radius = self.manifold.sqdist(embedding_coords, origin)
             avg_radius += hyperbolic_radius
         avg_radius /= len(embeddings)
@@ -151,7 +155,7 @@ class LPModel(BaseModel):
             edges_false = data[f'{split}_edges_false']
         pos_scores = self.decode(embeddings, data[f'{split}_edges'])
         neg_scores = self.decode(embeddings, edges_false)
-        
+        # How does system balance number of positive edges from number of negative edges? SAMPLES THEM!!!
         preds = torch.stack([pos_scores, neg_scores], dim=-1)
         
         # preds = torch.stack([exp_pos_scores, exp_neg_scores], dim=-1)
@@ -196,34 +200,43 @@ class LPModel(BaseModel):
                 pos_scores = pos_scores[:, 0]
                 neg_scores = neg_scores[:, 0]
             # adj_prob = graph_data['adj_prob']
-
-            use_thicks_myelins = True
-            if self.args.dataset == 'cam_can_multiple' and use_thicks_myelins:
+            
+            
+            # TODO: REVERT USETHICKSMYELINS TO TRUE
+            if self.args.dataset == 'cam_can_multiple' and self.args.use_thicks_myelins:
                 plv_matrix = graph_data_dict['features'][:, 2:]
             else:
                 plv_matrix = graph_data_dict['features']
             plv_matrix_numpy = plv_matrix.clone().detach().cpu().numpy()
-            adj_prob = self.get_adj_prob(plv_matrix_numpy, is_stretch_sigmoid=False)
-            neg_probs = self.true_probs(adj_prob, edges_false)
-            pos_probs = self.true_probs(adj_prob, edges)
+            
+            # Save time for margin loss calculations since PLV probabilities not needed for margin loss
+            if not self.args.use_margin_loss:
+                adj_prob = self.get_adj_prob(plv_matrix_numpy, is_stretch_sigmoid=False)
+                neg_probs = self.true_probs(adj_prob, edges_false)
+                pos_probs = self.true_probs(adj_prob, edges)
 
-            pos_probs_tensor = torch.Tensor(pos_probs)
-            neg_probs_tensor = torch.Tensor(neg_probs)
+                pos_probs_tensor = torch.Tensor(pos_probs)
+                neg_probs_tensor = torch.Tensor(neg_probs)
+                
+            else:
+                pos_probs_tensor = torch.Tensor([0])
+                neg_probs_tensor = torch.Tensor([0])
+            
             pos_scores_tensor = torch.Tensor(pos_scores)
             neg_scores_tensor = torch.Tensor(neg_scores)
             
-            # exp_pos_scores_tensor = torch.exp(pos_scores_tensor)
-            # exp_neg_scores_tensor = torch.exp(neg_scores_tensor)
-        
             edges_full.append(edges)
             edges_false_full.append(edges_false)
             pos_probs_full.append(pos_probs_tensor)
             neg_probs_full.append(neg_probs_tensor)
             pos_scores_full.append(pos_scores_tensor)
             neg_scores_full.append(neg_scores_tensor)
-            # print("EXPONENTIATED SCORES: ", exp_pos_scores_tensor, exp_neg_scores_tensor)
+
+            # exp_pos_scores_tensor = torch.exp(pos_scores_tensor)
+            # exp_neg_scores_tensor = torch.exp(neg_scores_tensor)
             # pos_scores_full.append(exp_pos_scores_tensor)
             # neg_scores_full.append(exp_neg_scores_tensor)
+            
             # TODO: TEST HOW THIS CHANGES EMBEDDINGS!!! MULTIPLY BY CONSTANT TERM REGULARIZATION
             
             # avg_radius = self.get_avg_hyperbolic_radius(embeddings)
@@ -240,7 +253,8 @@ class LPModel(BaseModel):
         neg_probs_comb = torch.cat(neg_probs_full)
         pos_scores_comb = torch.cat(pos_scores_full)
         neg_scores_comb = torch.cat(neg_scores_full)
-
+        
+        
         ### edges,edges_false only used for their length, so don't matter
         metrics = self.loss_handler(edges_comb,
                                     edges_false_comb,
@@ -262,32 +276,39 @@ class LPModel(BaseModel):
         
         return dist
     def get_edges(self, embeddings, data, split):
-            if not self.is_inductive:
-                edges_false = data[f'{split}_edges_false']
-                edges = data[f'{split}_edges']
-                
-            else: ## because train / val splits naturally are unbalanced-- maybe try one without balancing?
+        if not self.is_inductive:
+            edges_false = data[f'{split}_edges_false']
+            edges = data[f'{split}_edges']
+            
+        else: ## because train / val splits naturally are unbalanced-- maybe try one without balancing?
+            edges = data['edges'] 
+            num_pos_edges = len(edges)
+            num_neg_edges = len(data['edges_false'])
+            # TODO: With MSE Loss (not Margin Loss), test whether better results without sampling/balance
+            if self.args.use_margin_loss:
+                edges_false = data['edges_false'][np.random.randint(0, num_neg_edges, num_pos_edges)] # Balancing Positive / Negative Edges
+            else:
                 edges_false = data['edges_false']
-                edges = data['edges'] 
-                
-            # sample_rate = 10
-            # sample_rate = -1 ## for no sampling
-            # if split == ('train') and (sample_rate > 0): 
-            #     try:
-            #         self.train_only
-            #     except:
-            #         self.train_only=False
-            #     if self.train_only and not self.is_inductive:  
-            #         splits = ['val','test']
-            #         for s in splits:
-            #             edges_false = torch.concat([edges_false,
-            #                                         data[f'{s}_edges_false']])
-                        
-            #             edges = torch.concat([edges,data[f'{s}_edges']]) 
-            #     edges_false = edges_false[np.random.randint(0, len(edges_false), len(edges)*sample_rate)]
-                
-            #     self.previous_edges_false = edges_false
-            return edges, edges_false
+            # edges_false = data['edges_false'][np.random.randint(0, self.nb_false_edges, self.nb_edges)] # Balancing Positive / Negative Edges
+            
+        # sample_rate = 10
+        # sample_rate = -1 ## for no sampling
+        # if split == ('train') and (sample_rate > 0): 
+        #     try:
+        #         self.train_only
+        #     except:
+        #         self.train_only=False
+        #     if self.train_only and not self.is_inductive:  
+        #         splits = ['val','test']
+        #         for s in splits:
+        #             edges_false = torch.concat([edges_false,
+        #                                         data[f'{s}_edges_false']])
+                    
+        #             edges = torch.concat([edges,data[f'{s}_edges']]) 
+        #     edges_false = edges_false[np.random.randint(0, len(edges_false), len(edges)*sample_rate)]
+            
+        #     self.previous_edges_false = edges_false
+        return edges, edges_false
     # Cole also has code for encoding node degree as features
 
     def loss_handler(self, 
@@ -300,28 +321,43 @@ class LPModel(BaseModel):
                     num_graphs):
         # Cole mentioned using use_weighted loss
         self.args.use_weighted_loss = True
-        if hasattr(self.args, 'use_weighted_loss') and self.args.use_weighted_loss:
-            loss = F.mse_loss(pos_scores, pos_probs)
-            neg_loss= F.mse_loss(neg_scores, neg_probs)
+        if not self.args.use_margin_loss:
+            if hasattr(self.args, 'use_weighted_loss') and self.args.use_weighted_loss:
+                loss = F.mse_loss(pos_scores, pos_probs)
+                neg_loss= F.mse_loss(neg_scores, neg_probs)
+            else:
+                loss = F.binary_cross_entropy(pos_scores, torch.ones_like(pos_scores)) 
+                neg_loss=F.binary_cross_entropy(neg_scores, torch.zeros_like(neg_scores))
+            loss += neg_loss
+            if pos_scores.is_cuda:
+                pos_scores = pos_scores.cpu()
+                neg_scores = neg_scores.cpu()
+        else:
+            
+            # NOTE: Does not use min-maxed probabilities from PLV Matrix, only binarized scores it seems 
             # MARGIN Loss requires predicted and true probs to be in same tensor.....
             # TODO: Make sure this is correct way of feeding into Margin Loss
             # loss = self.loss(torch.stack([pos_probs, pos_scores]))
             # neg_loss = self.loss(torch.stack([neg_probs, neg_scores]))
-        else:
-            loss = F.binary_cross_entropy(pos_scores, torch.ones_like(pos_scores)) 
-            neg_loss=F.binary_cross_entropy(neg_scores, torch.zeros_like(neg_scores))
-        loss += neg_loss
-        if pos_scores.is_cuda:
-            pos_scores = pos_scores.cpu()
-            neg_scores = neg_scores.cpu()
-
+            
+            preds = torch.stack([pos_scores, neg_scores], dim=-1)
+            loss = self.loss(preds)
+            logging.info(f"Margin Loss: {loss}")
+            
         labels = [1] * pos_scores.shape[0] + [0] * neg_scores.shape[0]
         preds = np.array(list(pos_scores.data.cpu().numpy()) + list(neg_scores.data.cpu().numpy()))
         roc = roc_auc_score(labels, preds)
         ap = average_precision_score(labels, preds)
         acc = self.binary_acc(preds, labels)
-        logging.info(f"Accuracy: {acc}") 
+
+        # logging.info(f"Accuracy: {acc}") 
         
+        
+        # preds_binary = np.round(preds)
+        
+        # tn, fp, fn, tp = confusion_matrix(labels, preds_binary).ravel()
+        # logging.info(f"Confusion Matrix :: TN: {tn}, FP: {fp}, FN: {fn}, TP: {tp}")
+
         metrics = {'loss': loss, 
                     'roc': roc, 
                     'ap': ap,
@@ -567,7 +603,7 @@ class LPModel(BaseModel):
                     raise Exception('why are we getting a list')
                 label = label[0]
 
-            if round(predicted_label) == round(label): 
+            if round(predicted_label) == round(label): # So Cole is using a threshold of 0.5 for pos_scores/neg_scores
                 num_correct += 1
         
         acc = float(num_correct) / float(len(labels))
@@ -578,5 +614,4 @@ class LPModel(BaseModel):
 
     def has_improved(self, m1, m2):
         return 0.5 * (m1['roc'] + m1['ap']) < 0.5 * (m2['roc'] + m2['ap'])
-
 

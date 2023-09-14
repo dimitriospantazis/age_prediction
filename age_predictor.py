@@ -1,13 +1,17 @@
+from nn_regressor import Neural_Network_Regressor
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import TruncatedSVD, PCA, NMF
 from sklearn.manifold import TSNE, Isomap
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.linear_model import Ridge
 from sklearn.metrics import mean_squared_error
 from umap import UMAP
 import matplotlib.pyplot as plt
-
+from visualization import to_poincare
+import torch
+from hyperbolic_clustering.utils.utils import poincare_dist
 import numpy as np 
 import networkx as nx
 from typing import List
@@ -18,24 +22,117 @@ import numpy as np
 import os 
 import pickle
 
+BAR_WIDTH = 0.35
 NUM_ROIS = 360
-date = "2023_6_8"
-log_num = '9'
-log_path = os.path.join("logs", "lp", date, log_num)
-
+NUM_MEG_COLE_ROIS = 90
 age_labels = np.load(os.path.join("data", "cam_can_multiple", "age_labels_592_sbj_filtered.npy"))
-embeddings_dir = os.path.join(log_path, 'embeddings')
+meg_age_labels = np.load(os.path.join("data", "meg", "meg_age_labels_180.npy"))
 
-class Age_Predictor:
-    def __init__(self, type_of_regression: str, projection_type: str="SQ-R", architecture: str="FHNN", dataset: str="Cam-CAN"):
-        type_of_regression = type_of_regression.lower()
+class Age_Model:
+    def __init__(self, date : str, log_num : str, projection_type: str ="HR", dataset: str ="Cam-CAN"):
+        log_path = os.path.join("logs", "lp", date, log_num)
+        print(f"Using Log Path : {log_path}")
+        self.embeddings_dir = os.path.join(log_path, 'embeddings')
         projection_type = projection_type.replace("-", "").upper()
+        self.projection_type = projection_type
+        self.train_indices = self.get_split_indices("train")
+        self.val_indices = self.get_split_indices("val")
+        self.test_indices = self.get_split_indices("test")
+        self.dataset = dataset
+        if dataset not in ["Cam-CAN", "MEG"]:
+            raise ValueError("Dataset must be either Cam-CAN or MEG")
+        self.num_rois = NUM_ROIS if self.dataset == "Cam-CAN" else NUM_MEG_COLE_ROIS
+
+    def project_embeddings(self, embeddings_list) -> np.ndarray:
+        projection_function = self.get_projection_function()
+        # scaled_embeddings = self.scale_embeddings(embeddings_list)
+        # projected_embeddings = [projection_function(embeddings) for embeddings in tqdm(scaled_embeddings)]
+        projected_embeddings = [projection_function(embeddings) for embeddings in tqdm(embeddings_list)]
+        np_projected_embeddings = np.array(projected_embeddings)
+        if self.projection_type != "HR": 
+            projected_embeddings = np_projected_embeddings.reshape((len(np_projected_embeddings), self.num_rois))
+        return projected_embeddings
+    # TODO: Figure out if should scale before or after projection
+    def scale_embeddings(self, embeddings_list) -> np.ndarray:
+        print("Scaling Embeddings :")
+        scaler = StandardScaler()
+        scaled_embeddings = [scaler.fit_transform(embeddings) for embeddings in tqdm(embeddings_list)]
+        np_scaled_embeddings = np.array(scaled_embeddings)
+        scaled_embeddings = np_scaled_embeddings.reshape((len(np_scaled_embeddings), self.num_rois))
+        return scaled_embeddings
+    def get_projection_function(self):
+        projection_function = lambda x : x
+        if self.projection_type == "HR": 
+            
+            def inner_product(u, v):
+                return -u[0]*v[0] + np.dot(u[1:], v[1:]) 
+            def get_hyperbolic_radius(embeddings):
+                origin = np.array([1, 0, 0]) # .to(self.args.device)
+                return [np.arccosh(-1 * inner_product(origin, coord)) for coord in embeddings]
+            
+            def get_poincare_radius(embeddings):
+                poincare_origin = torch.Tensor([0, 0]) 
+                torch_embeddings = torch.from_numpy(embeddings)
+                c = 1.0
+                poincare_embeddings = [to_poincare(torch_embedding, c) for torch_embedding in torch_embeddings]
+                return [poincare_dist(poincare_embedding, poincare_origin) for poincare_embedding in poincare_embeddings]
+            # def get_squared_radius(embeddings):
+            #     return [coord[0] ** 2 + coord[1] ** 2 + coord[2] ** 2 for coord in embeddings]
+            # projection_function = get_poincare_radius
+            projection_function = get_hyperbolic_radius
+
+        elif self.projection_type == "TSNE": projection_function = TSNE(n_components=1, init='random', perplexity=3).fit_transform
+        elif self.projection_type == "SVD": projection_function = TruncatedSVD(n_components=1).fit_transform
+        elif self.projection_type == "PCA": projection_function = PCA(n_components=1).fit_transform
+        elif self.projection_type == "ISOMAP": projection_function = Isomap(n_components=1).fit_transform
+        elif self.projection_type == "UMAP": projection_function = UMAP(n_components=1).fit_transform
+        else: raise AssertionError(f"Invalid Projection Type : {self.projection_type}!")
+        # Other possibilities: MDS, LLE, Laplacian Eigenmaps, etc.
+        return projection_function
+            
+    def get_split_indices(self, split_str):
+        split_indices = []
+        for split_embeddings_dir in os.listdir(self.embeddings_dir):
+            if split_str not in split_embeddings_dir: continue
+            _, _, split_index_str = split_embeddings_dir.split("_")
+            split_index, _ = split_index_str.split(".")
+            split_index = int(split_index)
+            split_indices.append(split_index)
+        return sorted(split_indices)
+
+class Age_Predictor(Age_Model):
+    def __init__(self, date : str, log_num : str, type_of_regression: str, projection_type: str="HR", architecture: str="FHNN", dataset: str="Cam-CAN", alpha=100):
+        """
+        1. Data MEG MRI fMRI
+            Access PLV Subject Matrices 
+        
+        2. Get Adjacency Matrix
+            Define Threshold
+            Binarize Matrix
+        
+        3. Create Brain Graph
+            Training Set    
+            Validation Set 
+            Test Set
+        
+        4. Create HGCNN Embeddings
+            Visualize Embeddings by plotting in Poincare Disk --> Drew Wilimitis Code
+        
+        5. Ridge Regression
+        
+        6. Evaluate Regression Model: MSE
+        
+        7. Visualize Predicted Age vs. Actual Age
+        """
+        super().__init__(date, log_num, projection_type, dataset)
+        type_of_regression = type_of_regression.lower()
         self.architecture = architecture
         self.dataset = dataset
         if type_of_regression == "linear":
             self.regressor_model = LinearRegression()
         elif type_of_regression == "ridge":
-            self.regressor_model = Ridge(alpha = 100.0)
+            print("Alpha Parameter :", alpha)
+            self.regressor_model = Ridge(alpha = alpha)
 
         elif type_of_regression == "polynomial":
             raise AssertionError("Polynomial Regression not implemented yet!")
@@ -45,144 +142,204 @@ class Age_Predictor:
         elif type_of_regression == "hyperbolic":
             raise AssertionError("Hyperbolic Regression not implemented yet!")
             self.regressor_model = HyperbolicCentroidRegression()
+        elif type_of_regression == "random_forest":
+            # self.regressor_model = RandomForestRegressor(n_estimators=50, random_state=42)
+            self.regressor_model = RandomForestRegressor(n_estimators=100, random_state=42)
+            # self.regressor_model = RandomForestRegressor(n_estimators=500, random_state=42)
+        
+        elif type_of_regression == "neural_network":
+            input_size = NUM_ROIS
+            hidden_size = NUM_ROIS
+            output_size = 1
+            lr = 0.001
+            self.regressor_model = Neural_Network_Regressor(input_size, hidden_size, output_size, learning_rate=lr)
         else:
             raise AssertionError(f"Invalid Regression type : {type_of_regression}!")
-        train_indices = []
-        for train_embeddings_dir in os.listdir(embeddings_dir):
-            if 'train' not in train_embeddings_dir: continue
-            _, _, train_index_str = train_embeddings_dir.split("_")
-            train_index, _ = train_index_str.split(".")
-            train_index = int(train_index)
-            train_indices.append(train_index)
+        if dataset == "Cam-CAN":
+            self.train_age_labels = [age_labels[train_index] for train_index in self.train_indices] 
+            self.val_age_labels = [age_labels[val_index] for val_index in self.val_indices]
+            self.test_age_labels = [age_labels[test_index] for test_index in self.test_indices]
+        elif dataset == "MEG":
+            self.train_age_labels = [meg_age_labels[train_index] for train_index in self.train_indices] 
+            self.val_age_labels = [meg_age_labels[val_index] for val_index in self.val_indices]
+            self.test_age_labels = [meg_age_labels[test_index] for test_index in self.test_indices]
+        else:
+            raise AssertionError(f"Invalid Dataset : {dataset}!")
+        self.model_str = "Linear" if type(self.regressor_model) == LinearRegression \
+            else "Ridge" if type(self.regressor_model) == Ridge \
+            else "Random Forest" if type(self.regressor_model) == RandomForestRegressor \
+            else "Feed-Forward NN" if type(self.regressor_model) == Neural_Network_Regressor \
+            else "Unknown"
         
-        self.train_indices = train_indices
-        self.train_age_labels = [age_labels[train_index] for train_index in train_indices]
-        
-        test_indices = []
-        for test_embeddings_dir in os.listdir(embeddings_dir):
-            if 'test' not in test_embeddings_dir: continue
-            _, _, test_index_str = test_embeddings_dir.split("_")
-            test_index, _ = test_index_str.split(".")
-            test_index = int(test_index)
-            test_indices.append(test_index)
-        
-        self.test_indices = test_indices
-        self.test_age_labels = [age_labels[test_index] for test_index in test_indices]
-        self.model_str = "Linear" if type(self.regressor_model) == LinearRegression else "Ridge"
-        self.projection_type = projection_type
-    # 1. Data MEG MRI fMRI
-    #   1.1. Access PLV Subject Matrices 
-    #
-    # 2. Get Adjacency Matrix
-    #    Define Threshold
-    #    Binarize Matrix
-    #   
-    # 3. Create Brain Graph
-    #    Training Set    
-    #    Validation Set 
-    #    Test Set
-    #
-    # 4. Create HGCNN Embeddings
-    #    
-    #    Visualize Embeddings by plotting in Poincare Disk --> Drew Wilimitis Code
-    # 
-    # 5. Ridge Regression
-    #    Hyperbolic Manifold Regression ???
-    # 
-    # 6. Evaluate Regression Model: MSE
-    #
-    # 7. Visualize Predicted Age vs. Actual Age
-    # 
     def regression(self) -> float:
-        # self.get_embeddings()
         self.train()
-        predicted_ages, mse_score = self.test()
-        self.plot_age_labels_vs_predicted_ages(predicted_ages)
-        self.visualize_model_parameters()
+        predicted_ages, mse_score, correlation = self.test()
+        # self.plot_age_labels_vs_predicted_ages(predicted_ages)
+        self.visualize_model_parameters(use_jet = False)
+        # TODO: Uncomment this
+        # self.plot_difference_between_predicted_and_labels(predicted_ages)
+        self.plot_age_labels_vs_predicted_ages_curves(predicted_ages)
+        self.plot_age_labels_directly_to_predicted_ages_curves(predicted_ages)
         print(f"{self.model_str} Model with Projection {self.projection_type} Mean Squared Error (MSE):", mse_score)
-        return mse_score
-    def visualize_model_parameters(self):
-        
+        return mse_score, correlation
+    def visualize_model_parameters(self, use_jet=False):
+        # plt.figure(figsize = (10, 10))
+        plt.figure()
         plt.title(f"{self.model_str} Model with Projection {self.projection_type} Trained Parameters")
         plt.ylabel('Parameter Value')
         plt.xlabel('Region Of Interest (ROI) Index')
-        plt.bar(range(NUM_ROIS), self.regressor_model.coef_)
+        x = np.arange(self.num_rois)
+        cmap = plt.cm.jet        
+        
+        if type(self.regressor_model) == RandomForestRegressor:
+            plt.bar(x, self.regressor_model.feature_importances_, color=cmap(x / len(x)))
+            return 
+        elif type(self.regressor_model) == Neural_Network_Regressor:
+            print(f"Model Parameters : {[tensor.shape for tensor in self.regressor_model.parameters()]}")
+            row_sums = [torch.sum(tensor, dim=0).detach().numpy() for tensor in self.regressor_model.parameters()]
+            print("ROW SUMS : ", row_sums)
+            x = np.arange(len(row_sums[0]))
+            plt.bar(x, row_sums[0], color=cmap(x / len(x)))
+            return
+        
+            # plt.imshow(self.regressor_model.parameters())
+        
+        if use_jet:
+            plt.bar(x, self.regressor_model.coef_, color=cmap(x / len(x)))
+        else:
+            plt.bar(x, self.regressor_model.coef_)
 
     def plot_age_labels_vs_predicted_ages(self, predicted_ages):
         # Generate x-axis values
-        x = np.arange(len(self.test_age_labels))
+        plt.figure()
+        x = np.arange(len(self.test_indices))
         # Set width of each bar
-        bar_width = 0.35
 
         # Plotting the barplots
-        fig, ax = plt.subplots()
-        # print("WE ARE PLOTTING THESE PREDICTED AGES", predicted_ages)
-        ax.bar(x - bar_width/2, self.test_age_labels, bar_width, label='Age Label')
-        ax.bar(x + bar_width/2, predicted_ages, bar_width, label='Predicted Age')
+        
+        plt.bar(x - BAR_WIDTH/2, self.test_age_labels, BAR_WIDTH, label='Age Label')
+        plt.bar(x + BAR_WIDTH/2, predicted_ages, BAR_WIDTH, label='Predicted Age')
 
         # Set labels, title, and legend
-        ax.set_xlabel('Subject Index')
-        ax.set_ylabel('Age')
-        ax.set_title(f'{self.model_str} Model with Projection {self.projection_type} Predicted Ages CamCAN 592 Filtered')
-        ax.legend()
-
+        plt.xticks(x, self.test_indices, rotation=90, fontsize=6)
+        plt.xlabel('Subject Index')
+        plt.ylabel('Age')
+        plt.title(f'{self.model_str} Model with Projection {self.projection_type}')
+        plt.legend()
+        
         # Show the plot
         plt.show()
+    
+    def plot_age_labels_vs_predicted_ages_curves(self, predicted_ages):
         
-    def project_embeddings(self, embeddings_list) -> np.ndarray:
-        projection_function = self.get_projection_function()
-        # scaled_embeddings = self.scale_embeddings(embeddings_list)
-        # projected_embeddings = [projection_function(embeddings) for embeddings in tqdm(scaled_embeddings)]
-        projected_embeddings = [projection_function(embeddings) for embeddings in tqdm(embeddings_list)]
-        np_projected_embeddings = np.array(projected_embeddings)
-        if self.projection_type != "SQR": 
-            projected_embeddings = np_projected_embeddings.reshape((len(np_projected_embeddings), NUM_ROIS))
-        return projected_embeddings
-    # TODO: FIGURE OUT IF SHOULD SCALE BEFORE OR AFTER PROJECTION!!!?
-    def scale_embeddings(self, embeddings_list) -> np.ndarray:
-        print("Scaling Embeddings :")
-        scaler = StandardScaler()
-        scaled_embeddings = [scaler.fit_transform(embeddings) for embeddings in tqdm(embeddings_list)]
-        np_scaled_embeddings = np.array(scaled_embeddings)
-        scaled_embeddings = np_scaled_embeddings.reshape((len(np_scaled_embeddings), NUM_ROIS))
-        return scaled_embeddings
-    def get_projection_function(self):
-        projection_function = lambda x : x
-        if self.projection_type == "SQR": 
-            def get_squared_radius(embeddings):
-                return [coord[0] ** 2 + coord[1] ** 2 + coord[2] ** 2 for coord in embeddings]
-            projection_function = get_squared_radius
-        elif self.projection_type == "TSNE": projection_function = TSNE(n_components=1, init='random', perplexity=3).fit_transform
-        elif self.projection_type == "SVD": projection_function = TruncatedSVD(n_components=1).fit_transform
-        elif self.projection_type == "PCA": projection_function = PCA(n_components=1).fit_transform
-        elif self.projection_type == "ISOMAP": projection_function = Isomap(n_components=1).fit_transform
-        elif self.projection_type == "UMAP": projection_function = UMAP(n_components=1).fit_transform
-        else: raise AssertionError(f"Invalid Projection Type : {self.projection_type}!")
-        # Other possibilities: MDS, LLE, Laplacian Eigenmaps, etc.
-        return projection_function
+        # Generate x-axis values
+        plt.figure()
+        x = np.arange(len(self.test_indices))
+        # x = np.arange(len(self.test_indices + self.val_indices))
+        plt.plot(x, predicted_ages, linestyle='-', marker='v', color='orange', label='Predicted Age', markersize=5)
+        # plt.plot(x, self.test_age_labels + self.val_age_labels, linestyle='-', marker='o', color='blue', label='Age Label', markersize=5)
+        plt.plot(x, self.test_age_labels, linestyle='-', marker='o', color='blue', label='Age Label', markersize=5)
+        # Set labels, title, and legend
+        plt.xticks(x, self.test_indices, rotation=90, fontsize=6)
+        # plt.xticks(x, self.test_indices + self.val_indices, rotation=90, fontsize=6)
+        plt.xlabel('Subject Index')
+        plt.ylabel('Age')
+        plt.title(f'{self.model_str} Model with Projection {self.projection_type} Predicted Ages')
+        plt.ylim(0, 100)
+        plt.legend()
+
+        plt.show()
+    
+    def plot_age_labels_directly_to_predicted_ages_curves(self, predicted_ages):
+        
+        # Generate x-axis values
+        plt.figure()
+        x = np.arange(len(self.test_age_labels))
+        y = np.arange(len(predicted_ages))
+        # x = np.arange(len(self.test_indices + self.val_indices))
+        # plt.plot(x, predicted_ages, linestyle='-', marker='v', color='orange', label='Predicted Age', markersize=5)
+        # plt.plot(x, self.test_age_labels + self.val_age_labels, linestyle='-', marker='o', color='blue', label='Age Label', markersize=5)
+        # plt.plot(x, self.test_age_labels, linestyle='-', marker='o', color='blue', label='Age Label', markersize=5)
+        plt.scatter(self.test_age_labels, predicted_ages, c='blue', marker='o', label='Actual vs. Predicted')
+        
+        # plt.xticks(x, self.test_indices + self.val_indices, rotation=90, fontsize=6)
+        plt.xlabel('Subject Age')
+        plt.ylabel('Predicted Age')
+        plt.title(f'{self.model_str} Model with Projection {self.projection_type} Predicted Ages')
+        plt.ylim(0, 100)
+        
+        # Add a diagonal line for reference (perfect prediction)
+        plt.plot([min(self.test_age_labels), max(self.test_age_labels)], [min(self.test_age_labels), max(self.test_age_labels)], linestyle='--', color='gray', label='Perfect Prediction')
+
+        plt.grid()
+        plt.legend(loc='upper left')
+        plt.show()        
+
+    def plot_difference_between_predicted_and_labels(self, predicted_ages):
+        # Generate x-axis values
+        plt.figure()
+        x = np.arange(len(self.test_indices))
+        
+        plt.bar(x - BAR_WIDTH/2, predicted_ages - self.test_age_labels, BAR_WIDTH, label='Predicted Age - Age Label')
+        plt.xticks(x, self.test_indices, rotation=90, fontsize=6)
+        # ax.set_xticklabels(self.test_indices, rotation=90)
+        plt.xlabel('Subject Index')
+        plt.ylabel('Age')
+        plt.title(f'{self.model_str} Model with Projection {self.projection_type} Difference Plot')
+        plt.legend()
+
+        plt.show()
+
     
     def test(self) -> float:
         """
         Must make sure training has been done beforehand
         Test Predicted Ages from embeddings
+        Returns Predicted Ages, MSE, and Correlation Coefficient between Predicted Ages and Actual Ages
         """
         
         test_embeddings_list = []
+        val_embeddings_list = []
         for test_index in self.test_indices:
-            test_embeddings = np.load(os.path.join(embeddings_dir, f'embeddings_test_{test_index}.npy'))
+            test_embeddings = np.load(os.path.join(self.embeddings_dir, f'embeddings_test_{test_index}.npy'))
             test_embeddings_list.append(test_embeddings)
-        if type(self.regressor_model) == LinearRegression or type(self.regressor_model) == Ridge:
+        for val_index in self.val_indices:
+            val_embeddings = np.load(os.path.join(self.embeddings_dir, f'embeddings_val_{val_index}.npy'))
+            val_embeddings_list.append(val_embeddings)
+        # TODO: Change back to only test_embeddings_list
+        # test_embeddings_list += val_embeddings_list
+        
+        if type(self.regressor_model) == LinearRegression \
+            or type(self.regressor_model) == Ridge \
+            or type(self.regressor_model) == RandomForestRegressor:
             print("Projecting Test Embeddings :")
             projected_embeddings = self.project_embeddings(test_embeddings_list)
-            if self.projection_type == "SQR": 
-                scaler = StandardScaler()
-                projected_embeddings = scaler.fit_transform(projected_embeddings)
+            
+            print("Scaling Projected Test Embeddings :")
+            scaler = StandardScaler()
+            projected_embeddings = scaler.fit_transform(projected_embeddings)
             predicted_ages = self.regressor_model.predict(projected_embeddings)
-        print("PROJECTED TEST EMBEDDINGS", projected_embeddings)
-        print("TEST LEN [0]", len(projected_embeddings))
+        if type(self.regressor_model) == Neural_Network_Regressor:
+            print("Projecting Test Embeddings :")
+            projected_embeddings = self.project_embeddings(test_embeddings_list)
+            print("Scaling Projected Test Embeddings :")
+            scaler = StandardScaler()
+            projected_embeddings = scaler.fit_transform(projected_embeddings)
+            projected_embeddings_tensor = torch.from_numpy(projected_embeddings).clone().detach().to(dtype=torch.float32).squeeze()
+            predicted_ages = self.regressor_model.predict(projected_embeddings_tensor)
+
+            predicted_ages = predicted_ages.squeeze() # Reduce extra dimension from [num_test, 1] to [num_test]
+            predicted_ages = predicted_ages.detach().numpy()
         print("Age Labels: ", self.test_age_labels)
         print("Predicted Ages: ", predicted_ages)
-        return predicted_ages, mean_squared_error(predicted_ages, self.test_age_labels)
+        
+        # TODO: RESTORE TO ONLY TEST AGE LABELS
+        # return predicted_ages, \
+        #         mean_squared_error(predicted_ages, self.test_age_labels + self.val_age_labels), \
+        #         np.corrcoef(predicted_ages, self.test_age_labels + self.val_age_labels)[0, 1]
+        return predicted_ages, \
+                mean_squared_error(predicted_ages, self.test_age_labels), \
+                np.corrcoef(predicted_ages, self.test_age_labels)[0, 1]
 
     def get_embeddings_to_labels(self):
         embeddings = []
@@ -194,7 +351,8 @@ class Age_Predictor:
                 train_index = int(train_index)
                 
                 age_label = age_labels[train_index]
-                
+                # meg_age_label = meg_age_labels[train_index]
+
                 embeddings = np.load(os.path.join(embeddings_directory, embeddings_filename))
                 # TODO: Matrix to Label seems inefficient
                 embeddings_to_labels[tuple(embeddings)] = age_label
@@ -210,18 +368,60 @@ class Age_Predictor:
         """
         
         train_embeddings_list = []
-        
+        val_embeddings_list = []
+        test_embeddings_list = []
         for train_index in self.train_indices:
-            train_embeddings = np.load(os.path.join(embeddings_dir, f'embeddings_train_{train_index}.npy'))
+            train_embeddings = np.load(os.path.join(self.embeddings_dir, f'embeddings_train_{train_index}.npy'))
             train_embeddings_list.append(train_embeddings)
-        if type(self.regressor_model) == LinearRegression or type(self.regressor_model) == Ridge:
+        for val_index in self.val_indices:
+            val_embeddings = np.load(os.path.join(self.embeddings_dir, f'embeddings_val_{val_index}.npy'))
+            val_embeddings_list.append(val_embeddings)
+        for test_index in self.test_indices:
+            test_embeddings = np.load(os.path.join(self.embeddings_dir, f'embeddings_test_{test_index}.npy'))
+            test_embeddings_list.append(test_embeddings)
+        
+        train_embeddings_list += val_embeddings_list
+        # TODO: Change back to train + val
+        # train_embeddings_list += test_embeddings_list
+        if type(self.regressor_model) == LinearRegression \
+            or type(self.regressor_model) == Ridge \
+            or type(self.regressor_model) == RandomForestRegressor:
             # Projection Mapping from 3D to 1D
             print("Projecting Train Embeddings :")
             projected_embeddings = self.project_embeddings(train_embeddings_list)
-            if self.projection_type == "SQR": 
-                scaler = StandardScaler()
-                projected_embeddings = scaler.fit_transform(projected_embeddings)
-            self.regressor_model.fit(projected_embeddings, self.train_age_labels)
+            print("Scaling Projected Train Embeddings :")
+            scaler = StandardScaler()
+            projected_embeddings = scaler.fit_transform(projected_embeddings)
+            # self.regressor_model.fit(projected_embeddings, self.train_age_labels)
+            # TODO: Change back to train + val
+            self.regressor_model.fit(projected_embeddings, self.train_age_labels + self.val_age_labels)
+            # self.regressor_model.fit(projected_embeddings, self.train_age_labels + self.val_age_labels + self.test_age_labels)
+        elif type(self.regressor_model == Neural_Network_Regressor):
+            print("Projecting Train Embeddings :")
+            projected_embeddings = self.project_embeddings(train_embeddings_list)
+            print("Scaling Projected Train Embeddings :")
+            scaler = StandardScaler()
+            projected_embeddings = scaler.fit_transform(projected_embeddings)
+
+            projected_embeddings_tensor = torch.from_numpy(np.array(projected_embeddings)) \
+                .clone() \
+                .detach() \
+                .to(dtype=torch.float32) \
+                .squeeze()
+            age_labels_tensor = torch.from_numpy(np.array(self.train_age_labels + self.val_age_labels)) \
+                .clone() \
+                .detach() \
+                .to(dtype=torch.float32) \
+                .squeeze()
+            # TODO: Change back to train + val
+            # age_labels_tensor = torch.from_numpy(np.array(self.train_age_labels + self.val_age_labels + self.test_age_labels)) \
+            #     .clone() \
+            #     .detach() \
+            #     .to(dtype=torch.float32) \
+            #     .squeeze()
+            self.regressor_model.train(projected_embeddings_tensor, age_labels_tensor)
+
+        else: raise AssertionError("Invalid Regression Model!")
 
     def predict_age(self, embeddings) -> float:
         """
@@ -243,3 +443,6 @@ class Age_Predictor:
         respective_age_labels = [pred_label[1] for pred_label in predicted_ages_with_age_labels]
         mse_loss = mean_squared_error(predicted_ages, respective_age_labels)
         return mse_loss
+
+
+
