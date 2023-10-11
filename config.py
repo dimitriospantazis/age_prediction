@@ -4,12 +4,14 @@ from utils.train_utils import add_flags_from_config
 
 config_args = {
     'training_config': {
-        'threshold': (0.23, 'PLV matrix to binary adjacency matrix threshold'),
+        'threshold': (0.3598, 'PLV matrix to binary adjacency matrix threshold'),
+        'sbj-index': (0, 'subject index for single FHNN training on subject PLV matrix; ranges from 0 to NUM_SBJS - 1'),
         'lr': (0.01, 'learning rate'),
         'dropout': (0.0, 'dropout probability'),
         'cuda': (-1, 'which cuda device to use (-1 for cpu training)'),
+        'epochs': (150, 'maximum number of epochs to train for'),
         # 'epochs': (150, 'maximum number of epochs to train for'),
-        'epochs': (300, 'maximum number of epochs to train for'),
+        # 'epochs': (300, 'maximum number of epochs to train for'),
         # 'epochs': (500, 'maximum number of epochs to train for'),
         # 'epochs': (1000, 'maximum number of epochs to train for'),
         # 'epochs': (5000, 'maximum number of epochs to train for'),
@@ -33,7 +35,7 @@ config_args = {
     },
     'model_config': {
         'task': ('nc', 'which tasks to train on, can be any of [lp, nc]'),
-        'model': ('GCN', 'which encoder to use, can be any of [Shallow, MLP, HNN, GCN, GAT, HyperGCN, HyboNet]'),
+        'model': ('GCN', 'which encoder to use, can be any of [Shallow, MLP, HNN, GCN, GAT, HGCN, HyboNet]'),
         'dim': (128, 'embedding dimension'),
         'manifold': ('Euclidean', 'which manifold to use, can be any of [Euclidean, Hyperboloid, PoincareBall, Lorentz]'),
         'c': (1.0, 'hyperbolic radius, set to None for trainable curvature'),

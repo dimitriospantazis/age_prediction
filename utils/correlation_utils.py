@@ -253,7 +253,7 @@ def get_node_level_measure_spearman_correlation_across_age(date: str, measure_st
 
     # TODO: Fix Embeddings DF method of capturing all subject data!!!!!
 
-    # CHANGE SO THAT HIS RESPECTS ORDERING OF AGE LABELS
+    # CHANGE SO THAT THIS RESPECTS ORDERING OF AGE LABELS
     if not precalculated_radii:
         average_roi_hyperbolic_radii_list_per_sbj = get_average_roi_hyperbolic_radii_per_sbj_across_runs(date)
     else:
@@ -305,7 +305,7 @@ def get_node_level_measure_spearman_correlation_across_age(date: str, measure_st
     plt.xlabel("Subject Index")
     plt.ylabel("Spearman Correlation")
     plt.ylim(-1, 1)
-    print("THESE ARE THE CHORRELATIONS")
+    print("THESE ARE THE CORRELATIONS")
     plt.plot(spearman_correlations)
 
     plt.figure()

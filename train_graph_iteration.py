@@ -64,7 +64,9 @@ def train(args):
     # TODO: Check how using supernode changes FULL 592 CAMCAN results : NOTE: Does not change much
     args.use_super_node = False
     args.use_thicks_myelins = False
-    args.use_margin_loss = True
+    # args.use_margin_loss = True
+    # TODO: Check how using MSE Loss with HGCN Model compares to FHNN and Cole Code?
+    args.use_margin_loss = False
     args.use_batch_learning = True
     logging.info("Use Super Node : {}".format(args.use_super_node))
     logging.info("Use Batch Learning : {}".format(args.use_batch_learning))

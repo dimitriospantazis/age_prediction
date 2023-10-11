@@ -3,13 +3,14 @@ import os
 import pickle as pkl
 import sys
 from typing import List
-
 import networkx as nx
 import numpy as np
 import scipy.sparse as sp
 import torch
 
-
+from utils.constants_utils import FIVE_PERCENT_THRESHOLD
+import logging
+logging.getLogger().setLevel(logging.INFO)
 THICK_INDEX = 0
 MYELIN_INDEX = 1
 TREE_DEPTH = 10
@@ -55,7 +56,7 @@ def load_data(args, datapath):
         data = load_data_nc(args.dataset, args.use_feats, datapath, args.split_seed)
     
     else:
-        data = load_data_lp(args.dataset, args.use_feats, datapath, args.use_super_node, threshold = args.threshold)
+        data = load_data_lp(args.dataset, args.use_feats, datapath, args.use_super_node, threshold = args.threshold, sbj_index=args.sbj_index)
         
         adj = data['adj_train']
         if args.task == 'lp':
@@ -194,7 +195,8 @@ def add_super_node_to_adjacency_matrix(adj):
     adj_matrix[-1][-1] = 0
     return adj_matrix
 
-def load_data_lp(dataset : str, use_feats : bool, data_path : str, use_super_node : bool =False, use_thicks_myelins : bool =True, threshold : float =1000.0):
+def load_data_lp(dataset : str, use_feats : bool, data_path : str, use_super_node : bool =False, use_thicks_myelins : bool =True, 
+                threshold : float =1000.0, sbj_index : int = 0):
     if dataset in ['cora', 'pubmed']:
         adj, features = load_citation_data(dataset, use_feats, data_path)[:2]
     elif dataset == 'disease_lp':
@@ -256,8 +258,7 @@ def load_data_lp(dataset : str, use_feats : bool, data_path : str, use_super_nod
         # features = np.eye(len(adj_mat))
         # print("PERMUTATION FEATURES", permutation)
         # print("PERMUTATION FEATURES", features[:5, :5])
-        import logging
-        logging.getLogger().setLevel(logging.INFO)
+        
         logging.info(f"Feature Matrix: {features}")
         
     elif dataset == 'cam_can_avg':
@@ -359,54 +360,11 @@ def load_data_lp(dataset : str, use_feats : bool, data_path : str, use_super_nod
         
         if use_noise: features = features + np.random.randn(*features.shape) * 1 / 100
 
-    elif dataset == 'cam_can_single':
-        # ADJ MAT
-        subject_index = 275
-        age_label = np.load(os.path.join(data_path, "age_labels_276_sbj.npy"))[subject_index]
-        print(f"Subject Index : {subject_index}")
-        print(f"Subject Age : {age_label}")
-        plv_tensor = np.load(os.path.join(data_path, "plv_tensor_276_sbj.npy"))
-        plv_sbj_matrix = plv_tensor[subject_index] 
-        plv_node_features = plv_sbj_matrix.copy()
-        plv_matrix = plv_sbj_matrix.copy()
-        plv_matrix [plv_matrix >= THRESHOLD] = 1
-        plv_matrix [plv_matrix < THRESHOLD] = 0
-        
-        adj = plv_matrix.copy()
-        if use_super_node: adj_mat = add_super_node_to_adjacency_matrix(adj)
-        else: adj_mat = adj
-        # Thicks Myelins is 2 x 276 x 360
-        # FEATURES 276 x 2 x 360
-        if use_feats:
-            thicks_myelins_tensor = np.load(os.path.join(data_path, "cam_can_thicks_myelins_tensor.npy")) # 276 as well  
-            
-            
-            thicks_sbj = thicks_myelins_tensor[THICK_INDEX][subject_index]
-            myelins_sbj = thicks_myelins_tensor[MYELIN_INDEX][subject_index]
-            use_normalize_thicks_myelins = False
-            if use_normalize_thicks_myelins: 
-                thicks_sbj_mean = np.mean(thicks_sbj)
-                thicks_sbj_sd = np.std(thicks_sbj)
-                myelins_sbj_mean = np.mean(myelins_sbj)
-                myelins_sbj_sd = np.std(myelins_sbj)
-                normalized_thicks_sbj = [(thick - thicks_sbj_mean) / thicks_sbj_sd for thick in thicks_sbj]
-                normalized_myelins_sbj = [(myelin - myelins_sbj_mean) / myelins_sbj_sd for myelin in myelins_sbj]
-                thicks_sbj, myelins_sbj = normalized_thicks_sbj, normalized_myelins_sbj    
-
-            thicks_myelins_features = np.vstack((thicks_sbj, myelins_sbj)).T
-            features = np.hstack((thicks_myelins_features, plv_node_features))
-            if use_super_node: 
-                one_hot_vec_for_super_node = np.zeros(len(features[0]))
-                one_hot_vec_for_super_node[-1] = 1
-                features = np.vstack((features, one_hot_vec_for_super_node))
-        else:
-            if use_super_node: features = np.eye(NUM_ROIS + 1) 
-            else: features = np.eye(NUM_ROIS)
-        adj = sp.csr_matrix(adj_mat)
-        
     elif dataset == 'cam_can_single_new':
         # ADJ MAT
-        subject_index = 100
+        subject_index = sbj_index
+        
+        logging.info("Cam-CAN Single Using Subject Index: {}".format(subject_index))
         age_label = np.load(os.path.join(data_path, "age_labels_592_sbj_filtered.npy"))[subject_index]
         print(f"Subject Index : {subject_index}")
         print(f"Subject Age : {age_label}")
@@ -415,15 +373,15 @@ def load_data_lp(dataset : str, use_feats : bool, data_path : str, use_super_nod
         plv_sbj_matrix = plv_tensor[subject_index] 
         plv_node_features = plv_sbj_matrix.copy()
         plv_matrix_thresholded = plv_sbj_matrix.copy()
-        plv_matrix_thresholded [plv_matrix_thresholded >= THRESHOLD_NEW] = 1
-        plv_matrix_thresholded [plv_matrix_thresholded < THRESHOLD_NEW] = 0
+        plv_matrix_thresholded [plv_matrix_thresholded >= FIVE_PERCENT_THRESHOLD] = 1
+        plv_matrix_thresholded [plv_matrix_thresholded < FIVE_PERCENT_THRESHOLD] = 0
         
         adj = plv_matrix_thresholded.copy()
         if use_super_node: adj_mat = add_super_node_to_adjacency_matrix(adj)
         else: adj_mat = adj
         
-        # Thicks Myelins is 2 x 276 x 360
-        # FEATURES 276 x 2 x 360
+        # Thicks Myelins is 2 x 592 x 360
+        # FEATURES 592 x 2 x 360
         print("USING IDENTITY MATRIX")
         use_feats = False
         if use_feats:
@@ -455,11 +413,9 @@ def load_data_lp(dataset : str, use_feats : bool, data_path : str, use_super_nod
     elif dataset == 'cam_can_multiple':
         train_graph_data_dicts, val_graph_data_dicts, test_graph_data_dicts = load_data_cam_can_new(threshold, NUM_SBJS, data_path, use_thicks_myelins, use_super_node)
     elif dataset == 'meg':
-        
         train_graph_data_dicts, val_graph_data_dicts, test_graph_data_dicts = load_data_meg(NUM_SBJS_MEG, data_path, use_thicks_myelins, use_super_node)
     elif dataset == 'binary_cyclic_tree_multiple':
         train_graph_data_dicts, val_graph_data_dicts, test_graph_data_dicts = load_data_binary_cyclic_tree_multiple(NUM_SBJS, data_path)
-
     else:
         raise FileNotFoundError('Dataset {} is not supported.'.format(dataset))
     if dataset =='cam_can_multiple' or dataset == "binary_cyclic_tree_multiple" or dataset == "meg":
@@ -639,18 +595,18 @@ def get_adjacency_matrix_for_binary_cyclic_tree_with_super_node(depth):
 def get_dataset_split_indices(num_sbjs) -> List[List[int]]:
     
     train_split_indices, val_split_indices, test_split_indices = [], [], []
-    import logging
     # logging.info("Using Only 18 - 30 Age Range")
     # logging.info("Using Only 18 - 30 Age Range")
     nth_index = 0
     nth_str = ["1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th"][nth_index]
     # num_sbjs = 70
     num_sbjs = NUM_SBJS
-    logging.info(f"Using Only {nth_str} {num_sbjs} Subjects")
+    # logging.info(f"Using Only {nth_str} {num_sbjs} Subjects")
     # TODO: Change Back to 587
     train_num, val_num = int(num_sbjs * TRAIN_SPLIT), int(num_sbjs * VAL_SPLIT)
     test_num = num_sbjs - train_num - val_num 
     # TODO: RESTORE BACK TO 100 % ONCE DONE TESTING SUBSET! 
+    # logging.info("Using only 10% of the data for training, validation and testing")
     # train_num = train_num // 10
     # val_num = val_num // 10
     # test_num = test_num // 10
@@ -689,7 +645,7 @@ def get_adjacency_matrix_cam_can(threshold : float, graph_index : int, data_path
     plv_tensor = np.load(os.path.join(data_path, "plv_tensor_592_sbj_filtered.npy"))
     plv_tensor = remove_self_loops(plv_tensor)
     plv_matrix = plv_tensor[graph_index].copy()
-    import logging
+    
     # logging.info(f"USING HIGHEST HIDDEN LAYER YET 1024")
     logging.info(f"Using PLV Threshold : {threshold}")
     plv_matrix [plv_matrix < threshold] = 0
@@ -948,8 +904,6 @@ def get_feature_matrix(graph_index : int, data_path : str, use_thicks_myelins : 
     # TODO: Make these more notorious! Can lead to confusion with results 
     # from not remembering that these are activated and therefore not using 
     # all features inadvertently!
-    import logging
-    logging.getLogger().setLevel(logging.INFO)
     
     # logging.info("Using Myelination + PLV Matrix")
     # feature_matrix = np.hstack((myelin_features, plv_features))
