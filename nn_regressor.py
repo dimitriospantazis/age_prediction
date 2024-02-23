@@ -14,8 +14,6 @@ class Neural_Network_Regressor(nn.Module):
         self.loss_function = nn.MSELoss()
         self.optimizer = optim.SGD(self.parameters(), lr=learning_rate)
         self.is_trained = False
-        
-        # self.soft_max_layer = nn.Softmax(dim=1)
     def forward(self, x):
         x = self.fully_connected_layer_1(x)
         x = self.relu(x)

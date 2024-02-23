@@ -52,7 +52,6 @@ class Age_Model:
         if self.projection_type != "HR": 
             projected_embeddings = np_projected_embeddings.reshape((len(np_projected_embeddings), self.num_rois))
         return projected_embeddings
-    # TODO: Figure out if should scale before or after projection
     def scale_embeddings(self, embeddings_list) -> np.ndarray:
         print("Scaling Embeddings :")
         scaler = StandardScaler()
@@ -176,7 +175,6 @@ class Age_Predictor(Age_Model):
         predicted_ages, mse_score, correlation = self.test()
         # self.plot_age_labels_vs_predicted_ages(predicted_ages)
         self.visualize_model_parameters(use_jet = False)
-        # TODO: Uncomment this
         # self.plot_difference_between_predicted_and_labels(predicted_ages)
         self.plot_age_labels_vs_predicted_ages_curves(predicted_ages)
         self.plot_age_labels_directly_to_predicted_ages_curves(predicted_ages)
@@ -306,8 +304,6 @@ class Age_Predictor(Age_Model):
         for val_index in self.val_indices:
             val_embeddings = np.load(os.path.join(self.embeddings_dir, f'embeddings_val_{val_index}.npy'))
             val_embeddings_list.append(val_embeddings)
-        # TODO: Change back to only test_embeddings_list
-        # test_embeddings_list += val_embeddings_list
         
         if type(self.regressor_model) == LinearRegression \
             or type(self.regressor_model) == Ridge \
@@ -332,11 +328,6 @@ class Age_Predictor(Age_Model):
             predicted_ages = predicted_ages.detach().numpy()
         print("Age Labels: ", self.test_age_labels)
         print("Predicted Ages: ", predicted_ages)
-        
-        # TODO: RESTORE TO ONLY TEST AGE LABELS
-        # return predicted_ages, \
-        #         mean_squared_error(predicted_ages, self.test_age_labels + self.val_age_labels), \
-        #         np.corrcoef(predicted_ages, self.test_age_labels + self.val_age_labels)[0, 1]
         return predicted_ages, \
                 mean_squared_error(predicted_ages, self.test_age_labels), \
                 np.corrcoef(predicted_ages, self.test_age_labels)[0, 1]
@@ -354,7 +345,6 @@ class Age_Predictor(Age_Model):
                 # meg_age_label = meg_age_labels[train_index]
 
                 embeddings = np.load(os.path.join(embeddings_directory, embeddings_filename))
-                # TODO: Matrix to Label seems inefficient
                 embeddings_to_labels[tuple(embeddings)] = age_label
         return embeddings_to_labels
     
@@ -381,8 +371,6 @@ class Age_Predictor(Age_Model):
             test_embeddings_list.append(test_embeddings)
         
         train_embeddings_list += val_embeddings_list
-        # TODO: Change back to train + val
-        # train_embeddings_list += test_embeddings_list
         if type(self.regressor_model) == LinearRegression \
             or type(self.regressor_model) == Ridge \
             or type(self.regressor_model) == RandomForestRegressor:
@@ -393,7 +381,6 @@ class Age_Predictor(Age_Model):
             scaler = StandardScaler()
             projected_embeddings = scaler.fit_transform(projected_embeddings)
             # self.regressor_model.fit(projected_embeddings, self.train_age_labels)
-            # TODO: Change back to train + val
             self.regressor_model.fit(projected_embeddings, self.train_age_labels + self.val_age_labels)
             # self.regressor_model.fit(projected_embeddings, self.train_age_labels + self.val_age_labels + self.test_age_labels)
         elif type(self.regressor_model == Neural_Network_Regressor):
@@ -413,12 +400,6 @@ class Age_Predictor(Age_Model):
                 .detach() \
                 .to(dtype=torch.float32) \
                 .squeeze()
-            # TODO: Change back to train + val
-            # age_labels_tensor = torch.from_numpy(np.array(self.train_age_labels + self.val_age_labels + self.test_age_labels)) \
-            #     .clone() \
-            #     .detach() \
-            #     .to(dtype=torch.float32) \
-            #     .squeeze()
             self.regressor_model.train(projected_embeddings_tensor, age_labels_tensor)
 
         else: raise AssertionError("Invalid Regression Model!")

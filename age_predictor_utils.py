@@ -302,8 +302,6 @@ class Age_Predictor(Age_Model):
         predicted_ages, mae_score, mse_score, correlation, r2 = self.test()
         # self.plot_age_labels_vs_predicted_ages(predicted_ages)
         self.visualize_model_parameters(use_jet = False)
-        # TODO: Uncomment this
-        # self.plot_difference_between_predicted_and_labels(predicted_ages)
         self.plot_age_labels_vs_predicted_ages_curves(predicted_ages)
         self.plot_age_labels_directly_to_predicted_ages_curves(predicted_ages)
         print(f"{self.model_str} Model with Projection {self.projection_type} Mean Absolute Error (MAE):", mae_score)
@@ -451,7 +449,7 @@ class Age_Predictor(Age_Model):
         # test_embeddings_list = [test_embeddings for index, test_embeddings in enumerate(test_embeddings_list) \
         #                             if is_inlier_or_outlier_list[index] == 1]
         projected_embeddings = [projected_embedding for index, projected_embedding in enumerate(projected_embeddings) \
-                                 if is_inlier_or_outlier_list[index] == 1]
+                                    if is_inlier_or_outlier_list[index] == 1]
         self.test_age_labels = [test_age_label for index, test_age_label in enumerate(self.test_age_labels) \
                                     if is_inlier_or_outlier_list[index] == 1]
         self.test_indices = [test_index for index, test_index in enumerate(self.test_indices) \
@@ -470,12 +468,6 @@ class Age_Predictor(Age_Model):
         print("Age Labels: ", self.test_age_labels)
         print("Predicted Ages: ", predicted_ages)
         
-        # TODO: RESTORE TO ONLY TEST AGE LABELS
-        # return predicted_ages, \
-                # mean_absolute_error(predicted_ages, self.test_age_labels + self.val_age_labels), \
-                # mean_squared_error(predicted_ages, self.test_age_labels + self.val_age_labels), \
-                # np.corrcoef(predicted_ages, self.test_age_labels + self.val_age_labels)[0, 1], \
-                # r2_score(predicted_ages, self.test_age_labels + self.val_age_labels)
         return predicted_ages, \
                 mean_absolute_error(predicted_ages, self.test_age_labels), \
                 mean_squared_error(predicted_ages, self.test_age_labels), \
@@ -495,7 +487,6 @@ class Age_Predictor(Age_Model):
                 # meg_age_label = meg_age_labels[train_index]
 
                 embeddings = np.load(os.path.join(embeddings_directory, embeddings_filename))
-                # TODO: Matrix to Label seems inefficient
                 embeddings_to_labels[tuple(embeddings)] = age_label
         return embeddings_to_labels
     
@@ -521,10 +512,6 @@ class Age_Predictor(Age_Model):
             test_embeddings = np.load(os.path.join(self.embeddings_dir, f'embeddings_test_{test_index}.npy'))
             test_embeddings_list.append(test_embeddings)
         
-        # train_embeddings_list += val_embeddings_list
-        # train_embeddings_list = val_embeddings_list
-        # TODO: Change back to train + val
-        # train_embeddings_list += test_embeddings_list
         print("Projecting Train Embeddings :")
         projected_embeddings = self.project_embeddings(train_embeddings_list)
         print("Scaling Projected Train Embeddings :")
@@ -532,10 +519,8 @@ class Age_Predictor(Age_Model):
         projected_embeddings = scaler.fit_transform(projected_embeddings)
         is_inlier_or_outlier_list = self.detect_outliers(projected_embeddings)
         
-        # train_embeddings_list = [train_embeddings for index, train_embeddings in enumerate(train_embeddings_list) \
-        #                          if is_inlier_or_outlier_list[index] == 1]
         projected_embeddings = [projected_embedding for index, projected_embedding in enumerate(projected_embeddings) \
-                                 if is_inlier_or_outlier_list[index] == 1]
+                                    if is_inlier_or_outlier_list[index] == 1]
         self.train_age_labels = [train_age_label for index, train_age_label in enumerate(self.train_age_labels) \
                                     if is_inlier_or_outlier_list[index] == 1]
         self.train_indices = [train_index for index, train_index in enumerate(self.train_indices) \
@@ -547,10 +532,6 @@ class Age_Predictor(Age_Model):
             or type(self.regressor_model) == HuberRegressor:
             # Projection Mapping from 3D to 1D
             self.regressor_model.fit(projected_embeddings, self.train_age_labels)
-            # TODO: Change back to train + val
-            # self.regressor_model.fit(projected_embeddings, self.train_age_labels + self.val_age_labels)
-            # self.regressor_model.fit(projected_embeddings, self.val_age_labels)
-            # self.regressor_model.fit(projected_embeddings, self.train_age_labels + self.val_age_labels + self.test_age_labels)
         elif type(self.regressor_model == Neural_Network_Regressor):
 
             projected_embeddings_tensor = torch.from_numpy(np.array(projected_embeddings)) \
@@ -558,11 +539,7 @@ class Age_Predictor(Age_Model):
                 .detach() \
                 .to(dtype=torch.float32) \
                 .squeeze()
-            # age_labels_tensor = torch.from_numpy(np.array(self.train_age_labels + self.val_age_labels)) \
-            #     .clone() \
-            #     .detach() \
-            #     .to(dtype=torch.float32) \
-            #     .squeeze()
+            
             age_labels_tensor = torch.from_numpy(np.array(self.train_age_labels)) \
                 .clone() \
                 .detach() \
@@ -666,9 +643,7 @@ class Age_Predictor_for_Node_Level_Measures(Age_Predictor):
         print("Scaling Projected Test Embeddings :")
         scaler = StandardScaler()
         projected_embeddings = scaler.fit_transform(projected_embeddings)
-        # train_embeddings_list += val_embeddings_list
-        # TODO: Change back to only test_embeddings_list
-        # test_embeddings_list += val_embeddings_list
+        
         # Detect and prune out outliers from regression
         is_inlier_or_outlier_list = self.detect_outliers(projected_embeddings)
 
@@ -695,12 +670,6 @@ class Age_Predictor_for_Node_Level_Measures(Age_Predictor):
         print("Age Labels: ", self.test_age_labels)
         print("Predicted Ages: ", predicted_ages)
         
-        # TODO: RESTORE TO ONLY TEST AGE LABELS
-        # return predicted_ages, \
-                # mean_absolute_error(predicted_ages, self.test_age_labels + self.val_age_labels), \
-                # mean_squared_error(predicted_ages, self.test_age_labels + self.val_age_labels), \
-                # np.corrcoef(predicted_ages, self.test_age_labels + self.val_age_labels)[0, 1], \
-                # r2_score(predicted_ages, self.test_age_labels + self.val_age_labels)
         return predicted_ages, \
                 mean_absolute_error(predicted_ages, self.test_age_labels), \
                 mean_squared_error(predicted_ages, self.test_age_labels), \
@@ -717,19 +686,12 @@ class Age_Predictor_for_Node_Level_Measures(Age_Predictor):
         """
         
         train_embeddings_list = []
-        # val_embeddings_list = []
-        # test_embeddings_list = []
-        # with open('node_level_measures_dict.pkl', 'rb') as file:
-        #     node_level_measures_dict = pickle.load(file)
         with open('node_level_and_hyper_measures.pkl', 'rb') as file:
             node_level_measures_dict = pickle.load(file)
-        # print(node_level_measures_dict.keys())
         measures = node_level_measures_dict[self.measure_str]
         
         train_embeddings_list = [measures[train_index] for train_index in self.train_indices]
-        # val_embeddings_list = [measures[val_index] for val_index in self.val_indices]
-        # test_embeddings_list = [measures[test_index] for test_index in self.test_indices]
-                               
+        
         projected_embeddings = train_embeddings_list
         print("Scaling Projected Train Embeddings :")
         scaler = StandardScaler()
@@ -737,26 +699,19 @@ class Age_Predictor_for_Node_Level_Measures(Age_Predictor):
 
         is_inlier_or_outlier_list = self.detect_outliers(projected_embeddings)
         projected_embeddings = [projected_embedding for index, projected_embedding in enumerate(projected_embeddings) \
-                                 if is_inlier_or_outlier_list[index] == 1]
+                                    if is_inlier_or_outlier_list[index] == 1]
         self.train_age_labels = [train_age_label for index, train_age_label in enumerate(self.train_age_labels) \
                                     if is_inlier_or_outlier_list[index] == 1]
         self.train_indices = [train_index for index, train_index in enumerate(self.train_indices) \
                                     if is_inlier_or_outlier_list[index] == 1]
 
-        # train_embeddings_list += val_embeddings_list
-        # train_embeddings_list = val_embeddings_list
-        # TODO: Change back to train + val
-        # train_embeddings_list += test_embeddings_list
         if type(self.regressor_model) == LinearRegression \
             or type(self.regressor_model) == Ridge \
             or type(self.regressor_model) == RandomForestRegressor \
             or type(self.regressor_model) == HuberRegressor:
 
             self.regressor_model.fit(projected_embeddings, self.train_age_labels)
-            # TODO: Change back to train + val
-            # self.regressor_model.fit(projected_embeddings, self.train_age_labels + self.val_age_labels)
-            # self.regressor_model.fit(projected_embeddings, self.val_age_labels)
-            # self.regressor_model.fit(projected_embeddings, self.train_age_labels + self.val_age_labels + self.test_age_labels)
+            
         elif type(self.regressor_model == Neural_Network_Regressor):
             
             projected_embeddings_tensor = torch.from_numpy(np.array(projected_embeddings)) \
@@ -764,23 +719,13 @@ class Age_Predictor_for_Node_Level_Measures(Age_Predictor):
                 .detach() \
                 .to(dtype=torch.float32) \
                 .squeeze()
-            # age_labels_tensor = torch.from_numpy(np.array(self.train_age_labels + self.val_age_labels)) \
-            #     .clone() \
-            #     .detach() \
-            #     .to(dtype=torch.float32) \
-            # #     .squeeze()
             
             age_labels_tensor = torch.from_numpy(np.array(self.train_age_labels)) \
                 .clone() \
                 .detach() \
                 .to(dtype=torch.float32) \
                 .squeeze()
-            # TODO: Change back to train + val
-            # age_labels_tensor = torch.from_numpy(np.array(self.train_age_labels + self.val_age_labels + self.test_age_labels)) \
-            #     .clone() \
-            #     .detach() \
-            #     .to(dtype=torch.float32) \
-            #     .squeeze()
+            
             self.regressor_model.train(projected_embeddings_tensor, age_labels_tensor)
 
         else: raise AssertionError("Invalid Regression Model!")
@@ -811,10 +756,7 @@ class Age_Predictor_for_Node_Level_Measures(Age_Predictor):
         plt.figure()
         x = np.arange(len(self.test_age_labels))
         y = np.arange(len(predicted_ages))
-        # x = np.arange(len(self.test_indices + self.val_indices))
-        # plt.plot(x, predicted_ages, linestyle='-', marker='v', color='orange', label='Predicted Age', markersize=5)
-        # plt.plot(x, self.test_age_labels + self.val_age_labels, linestyle='-', marker='o', color='blue', label='Age Label', markersize=5)
-        # plt.plot(x, self.test_age_labels, linestyle='-', marker='o', color='blue', label='Age Label', markersize=5)
+        
         plt.scatter(self.test_age_labels, predicted_ages, c='blue', marker='o', label='Actual vs. Predicted')
         
         # plt.xticks(x, self.test_indices + self.val_indices, rotation=90, fontsize=6)
@@ -966,7 +908,6 @@ class Age_Predictor_for_Single_Graphs(Age_Model_for_Single_Graphs):
         return mae_score, mse_score, correlation, r2
     
     def visualize_model_parameters(self, use_jet=False):
-        # plt.figure(figsize = (10, 10))
         plt.figure()
         plt.title(f"{self.model_str} Model with Projection {self.projection_type} Trained Parameters")
         plt.ylabel('Parameter Value')
@@ -1009,8 +950,7 @@ class Age_Predictor_for_Single_Graphs(Age_Model_for_Single_Graphs):
             log_path = os.path.join("logs", "lp", "592_single_graph_fhnn_runs", str(val_index))
             val_embeddings = np.load(os.path.join(log_path, 'embeddings.npy'))
             val_embeddings_list.append(val_embeddings)
-        # TODO: Change back to only test_embeddings_list
-        # test_embeddings_list += val_embeddings_list
+        
         print("Projecting Test Embeddings :")
         projected_embeddings = self.project_embeddings(test_embeddings_list)
         
@@ -1020,8 +960,6 @@ class Age_Predictor_for_Single_Graphs(Age_Model_for_Single_Graphs):
         
         is_inlier_or_outlier_list = self.detect_outliers(projected_embeddings)
         
-        # test_embeddings_list = [test_embeddings for index, test_embeddings in enumerate(test_embeddings_list) \
-        #                             if is_inlier_or_outlier_list[index] == 1]
         projected_embeddings = [projected_embedding for index, projected_embedding in enumerate(projected_embeddings) \
                                     if is_inlier_or_outlier_list[index] == 1]
         self.test_age_labels = [test_age_label for index, test_age_label in enumerate(self.test_age_labels) \
@@ -1042,12 +980,6 @@ class Age_Predictor_for_Single_Graphs(Age_Model_for_Single_Graphs):
         print("Age Labels: ", self.test_age_labels)
         print("Predicted Ages: ", predicted_ages)
         
-        # TODO: RESTORE TO ONLY TEST AGE LABELS
-        # return predicted_ages, \
-                # mean_absolute_error(predicted_ages, self.test_age_labels + self.val_age_labels), \
-                # mean_squared_error(predicted_ages, self.test_age_labels + self.val_age_labels), \
-                # np.corrcoef(predicted_ages, self.test_age_labels + self.val_age_labels)[0, 1], \
-                # r2_score(predicted_ages, self.test_age_labels + self.val_age_labels)
         return predicted_ages, \
                 mean_absolute_error(predicted_ages, self.test_age_labels), \
                 mean_squared_error(predicted_ages, self.test_age_labels), \
@@ -1067,7 +999,6 @@ class Age_Predictor_for_Single_Graphs(Age_Model_for_Single_Graphs):
                 # meg_age_label = meg_age_labels[train_index]
 
                 embeddings = np.load(os.path.join(embeddings_directory, embeddings_filename))
-                # TODO: Matrix to Label seems inefficient
                 embeddings_to_labels[tuple(embeddings)] = age_label
         return embeddings_to_labels
     
@@ -1096,10 +1027,6 @@ class Age_Predictor_for_Single_Graphs(Age_Model_for_Single_Graphs):
             test_embeddings = np.load(os.path.join(log_path, 'embeddings.npy'))
             test_embeddings_list.append(test_embeddings)
         
-        # train_embeddings_list += val_embeddings_list
-        # train_embeddings_list = val_embeddings_list
-        # TODO: Change back to train + val
-        # train_embeddings_list += test_embeddings_list
         print("Projecting Train Embeddings :")
         projected_embeddings = self.project_embeddings(train_embeddings_list)
         print("Scaling Projected Train Embeddings :")
@@ -1107,8 +1034,6 @@ class Age_Predictor_for_Single_Graphs(Age_Model_for_Single_Graphs):
         projected_embeddings = scaler.fit_transform(projected_embeddings)
         is_inlier_or_outlier_list = self.detect_outliers(projected_embeddings)
         
-        # train_embeddings_list = [train_embeddings for index, train_embeddings in enumerate(train_embeddings_list) \
-        #                          if is_inlier_or_outlier_list[index] == 1]
         projected_embeddings = [projected_embedding for index, projected_embedding in enumerate(projected_embeddings) \
                                  if is_inlier_or_outlier_list[index] == 1]
         self.train_age_labels = [train_age_label for index, train_age_label in enumerate(self.train_age_labels) \
@@ -1122,10 +1047,6 @@ class Age_Predictor_for_Single_Graphs(Age_Model_for_Single_Graphs):
             or type(self.regressor_model) == HuberRegressor:
             # Projection Mapping from 3D to 1D
             self.regressor_model.fit(projected_embeddings, self.train_age_labels)
-            # TODO: Change back to train + val
-            # self.regressor_model.fit(projected_embeddings, self.train_age_labels + self.val_age_labels)
-            # self.regressor_model.fit(projected_embeddings, self.val_age_labels)
-            # self.regressor_model.fit(projected_embeddings, self.train_age_labels + self.val_age_labels + self.test_age_labels)
         elif type(self.regressor_model == Neural_Network_Regressor):
 
             projected_embeddings_tensor = torch.from_numpy(np.array(projected_embeddings)) \
@@ -1133,11 +1054,6 @@ class Age_Predictor_for_Single_Graphs(Age_Model_for_Single_Graphs):
                 .detach() \
                 .to(dtype=torch.float32) \
                 .squeeze()
-            # age_labels_tensor = torch.from_numpy(np.array(self.train_age_labels + self.val_age_labels)) \
-            #     .clone() \
-            #     .detach() \
-            #     .to(dtype=torch.float32) \
-            #     .squeeze()
             age_labels_tensor = torch.from_numpy(np.array(self.train_age_labels)) \
                 .clone() \
                 .detach() \
@@ -1174,10 +1090,7 @@ class Age_Predictor_for_Single_Graphs(Age_Model_for_Single_Graphs):
         plt.figure()
         x = np.arange(len(self.test_age_labels))
         y = np.arange(len(predicted_ages))
-        # x = np.arange(len(self.test_indices + self.val_indices))
-        # plt.plot(x, predicted_ages, linestyle='-', marker='v', color='orange', label='Predicted Age', markersize=5)
-        # plt.plot(x, self.test_age_labels + self.val_age_labels, linestyle='-', marker='o', color='blue', label='Age Label', markersize=5)
-        # plt.plot(x, self.test_age_labels, linestyle='-', marker='o', color='blue', label='Age Label', markersize=5)
+        
         plt.scatter(self.test_age_labels, predicted_ages, c='blue', marker='o', label='Actual vs. Predicted')
         
         # plt.xticks(x, self.test_indices + self.val_indices, rotation=90, fontsize=6)
@@ -1227,4 +1140,3 @@ class Age_Predictor_for_Single_Graphs(Age_Model_for_Single_Graphs):
         plt.legend()
 
         plt.show()
-    
