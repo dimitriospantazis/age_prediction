@@ -1,4 +1,4 @@
-# Age Prediction through MEG Analysis using FHNN 
+# Age Prediction through hyperbolic radius extraction from hyperbolic embeddings of MEG brain networks using FHNN 
 Age Prediction using [Fully Hyperbolic Neural Networks](https://arxiv.org/abs/2105.14686) 
 
 ```
@@ -12,7 +12,7 @@ Age Prediction using [Fully Hyperbolic Neural Networks](https://arxiv.org/abs/21
 ```
 
 # Codes for Network Embedding
-The codes are based on [HGCN](https://github.com/HazyResearch/hgcn) repo. Codes related to HyboNet (FHNN) are remarked below.
+Source code based on [HGCN](https://github.com/HazyResearch/hgcn) and [FHNN](https://github.com/chenweize1998/fully-hyperbolic-nn) repositories. File structure for FHNN source code:
 
 ```
 📦gcn
@@ -40,7 +40,7 @@ The codes are based on [HGCN](https://github.com/HazyResearch/hgcn) repo. Codes 
  ┣ 📂utils
  ```
 
-## 1. Usage
+## 1. Training FHNN model using Graph Iteration
 Arguments passed to program:
 
 `--task` Specifies task. Can be [lp], lp denotes link prediction.
