@@ -63,7 +63,7 @@ Arguments passed to program:
 
 For other arguments, see `config.py`
 
-Example Run:
+In a Jupyter notebook, you can run an an example-run as follows: 
 
 ! python train_graph_iteration.py \
     --task lp \
