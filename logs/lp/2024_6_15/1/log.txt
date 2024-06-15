@@ -1,0 +1,1324 @@
+INFO:root:Using: cpu
+INFO:root:Using seed 1234.
+INFO:root:Use Super Node : False
+INFO:root:Use Batch Learning : True
+INFO:root:Use Margin Loss : True
+INFO:root:Use CT + Myelination : False
+INFO:root:Step Size for Reduction Factor (Gamma) for learning rate : None
+INFO:root:Reduction Factor (Gamma) for learning rate : 0.5
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.07220347 1.         0.         ... 0.         0.         0.        ]
+ [0.20805632 0.         1.         ... 0.         0.         0.        ]
+ [0.29763841 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.69558814 0.         0.         ... 1.         0.         0.        ]
+ [0.49456294 0.         0.         ... 0.         1.         0.        ]
+ [0.31368892 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.01361914 1.         0.         ... 0.         0.         0.        ]
+ [0.14936637 0.         1.         ... 0.         0.         0.        ]
+ [0.18331622 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.59884715 0.         0.         ... 1.         0.         0.        ]
+ [0.52664524 0.         0.         ... 0.         1.         0.        ]
+ [0.30058034 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.05146085 1.         0.         ... 0.         0.         0.        ]
+ [0.2041062  0.         1.         ... 0.         0.         0.        ]
+ [0.1088874  0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.62520652 0.         0.         ... 1.         0.         0.        ]
+ [0.32116216 0.         0.         ... 0.         1.         0.        ]
+ [0.29736551 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.06031728 1.         0.         ... 0.         0.         0.        ]
+ [0.3168381  0.         1.         ... 0.         0.         0.        ]
+ [0.16833993 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.59689704 0.         0.         ... 1.         0.         0.        ]
+ [0.46487585 0.         0.         ... 0.         1.         0.        ]
+ [0.32713079 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.0164534  1.         0.         ... 0.         0.         0.        ]
+ [0.28011337 0.         1.         ... 0.         0.         0.        ]
+ [0.15113401 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.60160816 0.         0.         ... 1.         0.         0.        ]
+ [0.398162   0.         0.         ... 0.         1.         0.        ]
+ [0.38882793 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.01061474 1.         0.         ... 0.         0.         0.        ]
+ [0.2398642  0.         1.         ... 0.         0.         0.        ]
+ [0.11040722 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.58629578 0.         0.         ... 1.         0.         0.        ]
+ [0.38285568 0.         0.         ... 0.         1.         0.        ]
+ [0.38412453 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.01751046 1.         0.         ... 0.         0.         0.        ]
+ [0.29676936 0.         1.         ... 0.         0.         0.        ]
+ [0.21736733 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.58937277 0.         0.         ... 1.         0.         0.        ]
+ [0.4249406  0.         0.         ... 0.         1.         0.        ]
+ [0.30232039 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.         1.         0.         ... 0.         0.         0.        ]
+ [0.2929923  0.         1.         ... 0.         0.         0.        ]
+ [0.22851244 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.45320423 0.         0.         ... 1.         0.         0.        ]
+ [0.57841224 0.         0.         ... 0.         1.         0.        ]
+ [0.41723741 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.01579561 1.         0.         ... 0.         0.         0.        ]
+ [0.20127906 0.         1.         ... 0.         0.         0.        ]
+ [0.14273678 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.64576133 0.         0.         ... 1.         0.         0.        ]
+ [0.4466038  0.         0.         ... 0.         1.         0.        ]
+ [0.39729196 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.07666587 1.         0.         ... 0.         0.         0.        ]
+ [0.37431415 0.         1.         ... 0.         0.         0.        ]
+ [0.21757271 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.47995575 0.         0.         ... 1.         0.         0.        ]
+ [0.44266742 0.         0.         ... 0.         1.         0.        ]
+ [0.43767296 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.0963409  1.         0.         ... 0.         0.         0.        ]
+ [0.29991407 0.         1.         ... 0.         0.         0.        ]
+ [0.24304794 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.5504178  0.         0.         ... 1.         0.         0.        ]
+ [0.44277008 0.         0.         ... 0.         1.         0.        ]
+ [0.34930052 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.         1.         0.         ... 0.         0.         0.        ]
+ [0.22396179 0.         1.         ... 0.         0.         0.        ]
+ [0.14682521 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.61008654 0.         0.         ... 1.         0.         0.        ]
+ [0.45267229 0.         0.         ... 0.         1.         0.        ]
+ [0.29987872 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.0650279  1.         0.         ... 0.         0.         0.        ]
+ [0.30112552 0.         1.         ... 0.         0.         0.        ]
+ [0.18087923 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.71512093 0.         0.         ... 1.         0.         0.        ]
+ [0.49980019 0.         0.         ... 0.         1.         0.        ]
+ [0.49368994 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.02901056 1.         0.         ... 0.         0.         0.        ]
+ [0.37599308 0.         1.         ... 0.         0.         0.        ]
+ [0.15910845 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.66137971 0.         0.         ... 1.         0.         0.        ]
+ [0.48459784 0.         0.         ... 0.         1.         0.        ]
+ [0.36529224 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.1729923  1.         0.         ... 0.         0.         0.        ]
+ [0.44266959 0.         1.         ... 0.         0.         0.        ]
+ [0.22547089 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.64566385 0.         0.         ... 1.         0.         0.        ]
+ [0.53822999 0.         0.         ... 0.         1.         0.        ]
+ [0.4403936  0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.09604271 1.         0.         ... 0.         0.         0.        ]
+ [0.33593368 0.         1.         ... 0.         0.         0.        ]
+ [0.25206364 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.51652486 0.         0.         ... 1.         0.         0.        ]
+ [0.3639349  0.         0.         ... 0.         1.         0.        ]
+ [0.36963558 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.06860113 1.         0.         ... 0.         0.         0.        ]
+ [0.32079893 0.         1.         ... 0.         0.         0.        ]
+ [0.18942497 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.62775309 0.         0.         ... 1.         0.         0.        ]
+ [0.55049584 0.         0.         ... 0.         1.         0.        ]
+ [0.47179071 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.08584793 1.         0.         ... 0.         0.         0.        ]
+ [0.34330294 0.         1.         ... 0.         0.         0.        ]
+ [0.26661364 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.4832897  0.         0.         ... 1.         0.         0.        ]
+ [0.47256878 0.         0.         ... 0.         1.         0.        ]
+ [0.366001   0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.01352361 1.         0.         ... 0.         0.         0.        ]
+ [0.47903883 0.         1.         ... 0.         0.         0.        ]
+ [0.2025944  0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.58406403 0.         0.         ... 1.         0.         0.        ]
+ [0.42619681 0.         0.         ... 0.         1.         0.        ]
+ [0.29326993 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.13363017 1.         0.         ... 0.         0.         0.        ]
+ [0.3532875  0.         1.         ... 0.         0.         0.        ]
+ [0.23882328 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.48562686 0.         0.         ... 1.         0.         0.        ]
+ [0.44221901 0.         0.         ... 0.         1.         0.        ]
+ [0.3568936  0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.02558905 1.         0.         ... 0.         0.         0.        ]
+ [0.22423411 0.         1.         ... 0.         0.         0.        ]
+ [0.14987174 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.46516503 0.         0.         ... 1.         0.         0.        ]
+ [0.4215436  0.         0.         ... 0.         1.         0.        ]
+ [0.47100125 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.08185093 1.         0.         ... 0.         0.         0.        ]
+ [0.39661328 0.         1.         ... 0.         0.         0.        ]
+ [0.33375917 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.55413404 0.         0.         ... 1.         0.         0.        ]
+ [0.53860849 0.         0.         ... 0.         1.         0.        ]
+ [0.50873509 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.05143567 1.         0.         ... 0.         0.         0.        ]
+ [0.44347987 0.         1.         ... 0.         0.         0.        ]
+ [0.2531705  0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.56647071 0.         0.         ... 1.         0.         0.        ]
+ [0.60378166 0.         0.         ... 0.         1.         0.        ]
+ [0.44795191 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.09390679 1.         0.         ... 0.         0.         0.        ]
+ [0.31881197 0.         1.         ... 0.         0.         0.        ]
+ [0.2142182  0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.64770231 0.         0.         ... 1.         0.         0.        ]
+ [0.38944524 0.         0.         ... 0.         1.         0.        ]
+ [0.36618154 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.04962267 1.         0.         ... 0.         0.         0.        ]
+ [0.26736189 0.         1.         ... 0.         0.         0.        ]
+ [0.19217236 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.56963271 0.         0.         ... 1.         0.         0.        ]
+ [0.39192071 0.         0.         ... 0.         1.         0.        ]
+ [0.36852307 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.00956616 1.         0.         ... 0.         0.         0.        ]
+ [0.29142905 0.         1.         ... 0.         0.         0.        ]
+ [0.15069716 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.65288348 0.         0.         ... 1.         0.         0.        ]
+ [0.5239105  0.         0.         ... 0.         1.         0.        ]
+ [0.38393516 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.05517403 1.         0.         ... 0.         0.         0.        ]
+ [0.27504728 0.         1.         ... 0.         0.         0.        ]
+ [0.15266901 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.61420243 0.         0.         ... 1.         0.         0.        ]
+ [0.51878497 0.         0.         ... 0.         1.         0.        ]
+ [0.50804859 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.09982382 1.         0.         ... 0.         0.         0.        ]
+ [0.37246506 0.         1.         ... 0.         0.         0.        ]
+ [0.2698586  0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.61627039 0.         0.         ... 1.         0.         0.        ]
+ [0.57530533 0.         0.         ... 0.         1.         0.        ]
+ [0.56518858 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.04268297 1.         0.         ... 0.         0.         0.        ]
+ [0.24282402 0.         1.         ... 0.         0.         0.        ]
+ [0.14367875 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.54225485 0.         0.         ... 1.         0.         0.        ]
+ [0.52277072 0.         0.         ... 0.         1.         0.        ]
+ [0.36047536 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.1288599  1.         0.         ... 0.         0.         0.        ]
+ [0.32384516 0.         1.         ... 0.         0.         0.        ]
+ [0.21172248 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.51309482 0.         0.         ... 1.         0.         0.        ]
+ [0.44911924 0.         0.         ... 0.         1.         0.        ]
+ [0.34596536 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.08546474 1.         0.         ... 0.         0.         0.        ]
+ [0.28986347 0.         1.         ... 0.         0.         0.        ]
+ [0.15880964 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.60259699 0.         0.         ... 1.         0.         0.        ]
+ [0.47499881 0.         0.         ... 0.         1.         0.        ]
+ [0.48943463 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.         1.         0.         ... 0.         0.         0.        ]
+ [0.15159241 0.         1.         ... 0.         0.         0.        ]
+ [0.1929885  0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.54992532 0.         0.         ... 1.         0.         0.        ]
+ [0.51433419 0.         0.         ... 0.         1.         0.        ]
+ [0.40639482 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.02977074 1.         0.         ... 0.         0.         0.        ]
+ [0.19681607 0.         1.         ... 0.         0.         0.        ]
+ [0.13867576 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.58822504 0.         0.         ... 1.         0.         0.        ]
+ [0.41734482 0.         0.         ... 0.         1.         0.        ]
+ [0.27693022 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.07064976 1.         0.         ... 0.         0.         0.        ]
+ [0.34083185 0.         1.         ... 0.         0.         0.        ]
+ [0.29801542 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.52734377 0.         0.         ... 1.         0.         0.        ]
+ [0.50269642 0.         0.         ... 0.         1.         0.        ]
+ [0.58601324 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.05390934 1.         0.         ... 0.         0.         0.        ]
+ [0.2482609  0.         1.         ... 0.         0.         0.        ]
+ [0.19647379 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.44742577 0.         0.         ... 1.         0.         0.        ]
+ [0.46268165 0.         0.         ... 0.         1.         0.        ]
+ [0.47360084 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.04335097 1.         0.         ... 0.         0.         0.        ]
+ [0.14583985 0.         1.         ... 0.         0.         0.        ]
+ [0.0627329  0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.52689935 0.         0.         ... 1.         0.         0.        ]
+ [0.33641824 0.         0.         ... 0.         1.         0.        ]
+ [0.3270513  0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.13411348 1.         0.         ... 0.         0.         0.        ]
+ [0.35981637 0.         1.         ... 0.         0.         0.        ]
+ [0.2963099  0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.77488604 0.         0.         ... 1.         0.         0.        ]
+ [0.61017611 0.         0.         ... 0.         1.         0.        ]
+ [0.61831868 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.02264702 1.         0.         ... 0.         0.         0.        ]
+ [0.21522263 0.         1.         ... 0.         0.         0.        ]
+ [0.18419424 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.63205779 0.         0.         ... 1.         0.         0.        ]
+ [0.42819687 0.         0.         ... 0.         1.         0.        ]
+ [0.25419518 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.03866416 1.         0.         ... 0.         0.         0.        ]
+ [0.31100599 0.         1.         ... 0.         0.         0.        ]
+ [0.28434519 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.56817574 0.         0.         ... 1.         0.         0.        ]
+ [0.45142233 0.         0.         ... 0.         1.         0.        ]
+ [0.37960662 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.02447333 1.         0.         ... 0.         0.         0.        ]
+ [0.19122219 0.         1.         ... 0.         0.         0.        ]
+ [0.21587578 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.5158897  0.         0.         ... 1.         0.         0.        ]
+ [0.45337487 0.         0.         ... 0.         1.         0.        ]
+ [0.42374877 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.09538897 1.         0.         ... 0.         0.         0.        ]
+ [0.33496805 0.         1.         ... 0.         0.         0.        ]
+ [0.21203877 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.39575604 0.         0.         ... 1.         0.         0.        ]
+ [0.49906121 0.         0.         ... 0.         1.         0.        ]
+ [0.51766466 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.         1.         0.         ... 0.         0.         0.        ]
+ [0.18504543 0.         1.         ... 0.         0.         0.        ]
+ [0.17103203 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.60631373 0.         0.         ... 1.         0.         0.        ]
+ [0.49324317 0.         0.         ... 0.         1.         0.        ]
+ [0.44684536 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.07968473 1.         0.         ... 0.         0.         0.        ]
+ [0.37362306 0.         1.         ... 0.         0.         0.        ]
+ [0.18227809 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.53934924 0.         0.         ... 1.         0.         0.        ]
+ [0.42653447 0.         0.         ... 0.         1.         0.        ]
+ [0.415341   0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.         1.         0.         ... 0.         0.         0.        ]
+ [0.08129034 0.         1.         ... 0.         0.         0.        ]
+ [0.0455984  0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.44698429 0.         0.         ... 1.         0.         0.        ]
+ [0.37082752 0.         0.         ... 0.         1.         0.        ]
+ [0.26800932 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.03165703 1.         0.         ... 0.         0.         0.        ]
+ [0.18783224 0.         1.         ... 0.         0.         0.        ]
+ [0.15220429 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.45491898 0.         0.         ... 1.         0.         0.        ]
+ [0.66739824 0.         0.         ... 0.         1.         0.        ]
+ [0.40209789 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.11558176 1.         0.         ... 0.         0.         0.        ]
+ [0.39753646 0.         1.         ... 0.         0.         0.        ]
+ [0.1812484  0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.65234265 0.         0.         ... 1.         0.         0.        ]
+ [0.53642448 0.         0.         ... 0.         1.         0.        ]
+ [0.50099379 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.03723734 1.         0.         ... 0.         0.         0.        ]
+ [0.16153541 0.         1.         ... 0.         0.         0.        ]
+ [0.02995856 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.5399721  0.         0.         ... 1.         0.         0.        ]
+ [0.29470008 0.         0.         ... 0.         1.         0.        ]
+ [0.18743057 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.10256978 1.         0.         ... 0.         0.         0.        ]
+ [0.42335094 0.         1.         ... 0.         0.         0.        ]
+ [0.30077922 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.4845404  0.         0.         ... 1.         0.         0.        ]
+ [0.51300354 0.         0.         ... 0.         1.         0.        ]
+ [0.53372031 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.01546112 1.         0.         ... 0.         0.         0.        ]
+ [0.24044471 0.         1.         ... 0.         0.         0.        ]
+ [0.13738128 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.59024275 0.         0.         ... 1.         0.         0.        ]
+ [0.3815172  0.         0.         ... 0.         1.         0.        ]
+ [0.34202334 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.00350063 1.         0.         ... 0.         0.         0.        ]
+ [0.27794373 0.         1.         ... 0.         0.         0.        ]
+ [0.15806448 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.51766616 0.         0.         ... 1.         0.         0.        ]
+ [0.26986743 0.         0.         ... 0.         1.         0.        ]
+ [0.24695385 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.12475882 1.         0.         ... 0.         0.         0.        ]
+ [0.2684284  0.         1.         ... 0.         0.         0.        ]
+ [0.29222538 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.67232628 0.         0.         ... 1.         0.         0.        ]
+ [0.55871525 0.         0.         ... 0.         1.         0.        ]
+ [0.35526848 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.04260887 1.         0.         ... 0.         0.         0.        ]
+ [0.32520825 0.         1.         ... 0.         0.         0.        ]
+ [0.23425616 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.59206489 0.         0.         ... 1.         0.         0.        ]
+ [0.46324168 0.         0.         ... 0.         1.         0.        ]
+ [0.34232796 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.04788547 1.         0.         ... 0.         0.         0.        ]
+ [0.33483909 0.         1.         ... 0.         0.         0.        ]
+ [0.2270139  0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.54861159 0.         0.         ... 1.         0.         0.        ]
+ [0.48689712 0.         0.         ... 0.         1.         0.        ]
+ [0.37105664 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.02644082 1.         0.         ... 0.         0.         0.        ]
+ [0.18599707 0.         1.         ... 0.         0.         0.        ]
+ [0.19862058 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.55394184 0.         0.         ... 1.         0.         0.        ]
+ [0.48614076 0.         0.         ... 0.         1.         0.        ]
+ [0.57568205 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.07856907 1.         0.         ... 0.         0.         0.        ]
+ [0.31896766 0.         1.         ... 0.         0.         0.        ]
+ [0.26233877 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.55917594 0.         0.         ... 1.         0.         0.        ]
+ [0.44131448 0.         0.         ... 0.         1.         0.        ]
+ [0.45883421 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.06037254 1.         0.         ... 0.         0.         0.        ]
+ [0.26879755 0.         1.         ... 0.         0.         0.        ]
+ [0.16500881 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.57985245 0.         0.         ... 1.         0.         0.        ]
+ [0.43610765 0.         0.         ... 0.         1.         0.        ]
+ [0.40166793 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.03762632 1.         0.         ... 0.         0.         0.        ]
+ [0.1334092  0.         1.         ... 0.         0.         0.        ]
+ [0.1805909  0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.61492995 0.         0.         ... 1.         0.         0.        ]
+ [0.46747133 0.         0.         ... 0.         1.         0.        ]
+ [0.37853544 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.02681771 1.         0.         ... 0.         0.         0.        ]
+ [0.24385399 0.         1.         ... 0.         0.         0.        ]
+ [0.18394221 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.48596769 0.         0.         ... 1.         0.         0.        ]
+ [0.26509373 0.         0.         ... 0.         1.         0.        ]
+ [0.20543264 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.07369205 1.         0.         ... 0.         0.         0.        ]
+ [0.40454781 0.         1.         ... 0.         0.         0.        ]
+ [0.29242372 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.74075366 0.         0.         ... 1.         0.         0.        ]
+ [0.4197014  0.         0.         ... 0.         1.         0.        ]
+ [0.27996217 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.         1.         0.         ... 0.         0.         0.        ]
+ [0.32079791 0.         1.         ... 0.         0.         0.        ]
+ [0.12588138 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.40404919 0.         0.         ... 1.         0.         0.        ]
+ [0.36899722 0.         0.         ... 0.         1.         0.        ]
+ [0.35213048 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.06989555 1.         0.         ... 0.         0.         0.        ]
+ [0.16516479 0.         1.         ... 0.         0.         0.        ]
+ [0.28213789 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.68425189 0.         0.         ... 1.         0.         0.        ]
+ [0.54903068 0.         0.         ... 0.         1.         0.        ]
+ [0.5690694  0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.         1.         0.         ... 0.         0.         0.        ]
+ [0.29217766 0.         1.         ... 0.         0.         0.        ]
+ [0.19329827 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.61676553 0.         0.         ... 1.         0.         0.        ]
+ [0.6103511  0.         0.         ... 0.         1.         0.        ]
+ [0.62553803 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.07936978 1.         0.         ... 0.         0.         0.        ]
+ [0.35318838 0.         1.         ... 0.         0.         0.        ]
+ [0.28714878 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.55838363 0.         0.         ... 1.         0.         0.        ]
+ [0.43998579 0.         0.         ... 0.         1.         0.        ]
+ [0.38085738 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.02955629 1.         0.         ... 0.         0.         0.        ]
+ [0.40321452 0.         1.         ... 0.         0.         0.        ]
+ [0.09572096 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.57464892 0.         0.         ... 1.         0.         0.        ]
+ [0.50943033 0.         0.         ... 0.         1.         0.        ]
+ [0.50132263 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.06743517 1.         0.         ... 0.         0.         0.        ]
+ [0.2923012  0.         1.         ... 0.         0.         0.        ]
+ [0.2570054  0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.72185027 0.         0.         ... 1.         0.         0.        ]
+ [0.30038117 0.         0.         ... 0.         1.         0.        ]
+ [0.23768633 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.06943407 1.         0.         ... 0.         0.         0.        ]
+ [0.33517162 0.         1.         ... 0.         0.         0.        ]
+ [0.18359852 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.5894787  0.         0.         ... 1.         0.         0.        ]
+ [0.40998141 0.         0.         ... 0.         1.         0.        ]
+ [0.38355898 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.02532972 1.         0.         ... 0.         0.         0.        ]
+ [0.32852677 0.         1.         ... 0.         0.         0.        ]
+ [0.15913058 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.65267661 0.         0.         ... 1.         0.         0.        ]
+ [0.49917545 0.         0.         ... 0.         1.         0.        ]
+ [0.32171542 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.07957782 1.         0.         ... 0.         0.         0.        ]
+ [0.20426841 0.         1.         ... 0.         0.         0.        ]
+ [0.1707182  0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.57938669 0.         0.         ... 1.         0.         0.        ]
+ [0.47940652 0.         0.         ... 0.         1.         0.        ]
+ [0.43363253 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.03977732 1.         0.         ... 0.         0.         0.        ]
+ [0.29841439 0.         1.         ... 0.         0.         0.        ]
+ [0.1481056  0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.57183894 0.         0.         ... 1.         0.         0.        ]
+ [0.43487831 0.         0.         ... 0.         1.         0.        ]
+ [0.47461443 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.06678103 1.         0.         ... 0.         0.         0.        ]
+ [0.3482309  0.         1.         ... 0.         0.         0.        ]
+ [0.12541563 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.65728737 0.         0.         ... 1.         0.         0.        ]
+ [0.66251874 0.         0.         ... 0.         1.         0.        ]
+ [0.45340307 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.05946673 1.         0.         ... 0.         0.         0.        ]
+ [0.28312656 0.         1.         ... 0.         0.         0.        ]
+ [0.23144333 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.51474907 0.         0.         ... 1.         0.         0.        ]
+ [0.47742401 0.         0.         ... 0.         1.         0.        ]
+ [0.47722975 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.00553752 1.         0.         ... 0.         0.         0.        ]
+ [0.27267897 0.         1.         ... 0.         0.         0.        ]
+ [0.14732055 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.54072689 0.         0.         ... 1.         0.         0.        ]
+ [0.42781577 0.         0.         ... 0.         1.         0.        ]
+ [0.35931155 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.04442943 1.         0.         ... 0.         0.         0.        ]
+ [0.26665852 0.         1.         ... 0.         0.         0.        ]
+ [0.17320863 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.60965642 0.         0.         ... 1.         0.         0.        ]
+ [0.4809834  0.         0.         ... 0.         1.         0.        ]
+ [0.47778746 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.05035906 1.         0.         ... 0.         0.         0.        ]
+ [0.28457402 0.         1.         ... 0.         0.         0.        ]
+ [0.08005246 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.55217974 0.         0.         ... 1.         0.         0.        ]
+ [0.44281978 0.         0.         ... 0.         1.         0.        ]
+ [0.36454639 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.05858424 1.         0.         ... 0.         0.         0.        ]
+ [0.25520393 0.         1.         ... 0.         0.         0.        ]
+ [0.20981997 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.59964837 0.         0.         ... 1.         0.         0.        ]
+ [0.51617192 0.         0.         ... 0.         1.         0.        ]
+ [0.52422803 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.06835182 1.         0.         ... 0.         0.         0.        ]
+ [0.29092334 0.         1.         ... 0.         0.         0.        ]
+ [0.16318737 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.49876891 0.         0.         ... 1.         0.         0.        ]
+ [0.41692182 0.         0.         ... 0.         1.         0.        ]
+ [0.3844238  0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.03631197 1.         0.         ... 0.         0.         0.        ]
+ [0.25855727 0.         1.         ... 0.         0.         0.        ]
+ [0.12831114 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.530508   0.         0.         ... 1.         0.         0.        ]
+ [0.45416058 0.         0.         ... 0.         1.         0.        ]
+ [0.51779971 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.07280992 1.         0.         ... 0.         0.         0.        ]
+ [0.33879287 0.         1.         ... 0.         0.         0.        ]
+ [0.14494101 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.40934843 0.         0.         ... 1.         0.         0.        ]
+ [0.41135402 0.         0.         ... 0.         1.         0.        ]
+ [0.35227646 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.03492515 1.         0.         ... 0.         0.         0.        ]
+ [0.30668181 0.         1.         ... 0.         0.         0.        ]
+ [0.1820164  0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.59971733 0.         0.         ... 1.         0.         0.        ]
+ [0.58911181 0.         0.         ... 0.         1.         0.        ]
+ [0.45273729 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.051251   1.         0.         ... 0.         0.         0.        ]
+ [0.13440276 0.         1.         ... 0.         0.         0.        ]
+ [0.10780569 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.54785654 0.         0.         ... 1.         0.         0.        ]
+ [0.47150196 0.         0.         ... 0.         1.         0.        ]
+ [0.43039976 0.         0.         ... 0.         0.         1.        ]]
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.00953821 1.         0.         ... 0.         0.         0.        ]
+ [0.21741552 0.         1.         ... 0.         0.         0.        ]
+ [0.05731786 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.5649545  0.         0.         ... 1.         0.         0.        ]
+ [0.37873443 0.         0.         ... 0.         1.         0.        ]
+ [0.36320368 0.         0.         ... 0.         0.         1.        ]]

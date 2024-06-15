@@ -677,12 +677,22 @@ def get_adjacency_matrix_cam_can(threshold : float, graph_index : int, data_path
     # logging.info("ADJACENCY MATRIX AFTER ADDING: \n {}".format(plv_matrix))
     if use_super_node:
         logging.info("Using Super Node")
-        plv_matrix = np.insert(plv_matrix, 0, 1, axis = 0)
-        plv_matrix = np.insert(plv_matrix, 0, 1, axis = 1)
-        plv_matrix[-1] = [1] * len(plv_matrix)
-        for i in range(len(plv_matrix)):
-            plv_matrix[i][-1] = 1
-        plv_matrix[-1][-1] = 0
+
+        #dimitrios:
+        plv_matrix_shifted = np.zeros((plv_matrix.shape[0], plv_matrix.shape[1]+1, plv_matrix.shape[2]+1))
+        plv_matrix_shifted[:,1:,1:] = plv_matrix
+        plv_matrix_shifted[:,0,:] = 1
+        plv_matrix_shifted[:,:,0] = 1
+        plv_matrix = plv_matrix_shifted
+
+        #this is wrong
+        #logging.info("Using Super Node")
+        #plv_matrix = np.insert(plv_matrix, 0, 1, axis = 0)
+        #plv_matrix = np.insert(plv_matrix, 0, 1, axis = 1)
+        #plv_matrix[-1] = [1] * len(plv_matrix)
+        #for i in range(len(plv_matrix)):
+        #    plv_matrix[i][-1] = 1
+        #plv_matrix[-1][-1] = 0
 
     return plv_matrix
 
@@ -784,9 +794,15 @@ def get_adj_mat_dataset_splits_with_features_and_age_labels_and_indices(threshol
     # val_split_adj_matrices = [adjacency_matrix for _ in val_split_indices]
     # test_split_adj_matrices = [adjacency_matrix for _ in test_split_indices]
 
-    train_split_adj_matrices = [get_adjacency_matrix_cam_can(threshold, i, data_path, use_super_node) for i in train_split_indices]
-    val_split_adj_matrices = [get_adjacency_matrix_cam_can(threshold, i, data_path, use_super_node) for i in val_split_indices]
-    test_split_adj_matrices = [get_adjacency_matrix_cam_can(threshold, i, data_path, use_super_node) for i in test_split_indices]
+    #dimitrios
+    train_split_adj_matrices = get_adjacency_matrix_cam_can(threshold, train_split_indices, data_path, use_super_node)
+    val_split_adj_matrices = get_adjacency_matrix_cam_can(threshold, val_split_indices, data_path, use_super_node)
+    test_split_adj_matrices = get_adjacency_matrix_cam_can(threshold, test_split_indices, data_path, use_super_node)
+
+    #this is too slow! loading the same file hundreds of times.
+    #train_split_adj_matrices = [get_adjacency_matrix_cam_can(threshold, i, data_path, use_super_node) for i in train_split_indices]
+    #val_split_adj_matrices = [get_adjacency_matrix_cam_can(threshold, i, data_path, use_super_node) for i in val_split_indices]
+    #test_split_adj_matrices = [get_adjacency_matrix_cam_can(threshold, i, data_path, use_super_node) for i in test_split_indices]
     
     train_feats = [get_feature_matrix(i, data_path, use_thicks_myelins, use_super_node) for i in train_split_indices]
     val_feats = [get_feature_matrix(i, data_path, use_thicks_myelins, use_super_node) for i in val_split_indices]
