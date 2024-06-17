@@ -1,0 +1,18 @@
+INFO:root:Using: cpu
+INFO:root:Using seed 1234.
+INFO:root:Use Super Node : False
+INFO:root:Use Batch Learning : True
+INFO:root:Use Margin Loss : True
+INFO:root:Use CT + Myelination : False
+INFO:root:Step Size for Reduction Factor (Gamma) for learning rate : None
+INFO:root:Reduction Factor (Gamma) for learning rate : 0.5
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Using CT + Identity Feature Matrix
+INFO:root:Use Super Node : False
+INFO:root:Feature Matrix with No Noise: [[0.07220347 1.         0.         ... 0.         0.         0.        ]
+ [0.20805632 0.         1.         ... 0.         0.         0.        ]
+ [0.29763841 0.         0.         ... 0.         0.         0.        ]
+ ...
+ [0.69558814 0.         0.         ... 1.         0.         0.        ]
+ [0.49456294 0.         0.         ... 0.         1.         0.        ]
+ [0.31368892 0.         0.         ... 0.         0.         1.        ]]

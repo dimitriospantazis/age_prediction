@@ -794,15 +794,15 @@ def get_adj_mat_dataset_splits_with_features_and_age_labels_and_indices(threshol
     # val_split_adj_matrices = [adjacency_matrix for _ in val_split_indices]
     # test_split_adj_matrices = [adjacency_matrix for _ in test_split_indices]
 
-    #dimitrios
-    train_split_adj_matrices = get_adjacency_matrix_cam_can(threshold, train_split_indices, data_path, use_super_node)
-    val_split_adj_matrices = get_adjacency_matrix_cam_can(threshold, val_split_indices, data_path, use_super_node)
-    test_split_adj_matrices = get_adjacency_matrix_cam_can(threshold, test_split_indices, data_path, use_super_node)
+    #load all plv data at once
+    adj_matrices = get_adjacency_matrix_cam_can(threshold, range(num_sbjs), data_path, use_super_node)
+   
+    #train, val, test adj matrices
+    train_split_adj_matrices = adj_matrices[train_split_indices]
+    val_split_adj_matrices = adj_matrices[val_split_indices]
+    test_split_adj_matrices = adj_matrices[test_split_indices]
 
-    #this is too slow! loading the same file hundreds of times.
-    #train_split_adj_matrices = [get_adjacency_matrix_cam_can(threshold, i, data_path, use_super_node) for i in train_split_indices]
-    #val_split_adj_matrices = [get_adjacency_matrix_cam_can(threshold, i, data_path, use_super_node) for i in val_split_indices]
-    #test_split_adj_matrices = [get_adjacency_matrix_cam_can(threshold, i, data_path, use_super_node) for i in test_split_indices]
+    feats = get_feature_matrix_vectorized(range(num_sbjs), data_path, use_thicks_myelins, use_super_node)
     
     train_feats = [get_feature_matrix(i, data_path, use_thicks_myelins, use_super_node) for i in train_split_indices]
     val_feats = [get_feature_matrix(i, data_path, use_thicks_myelins, use_super_node) for i in val_split_indices]
@@ -881,6 +881,122 @@ def remove_self_loops(plv_tensor):
         for i in range(NUM_ROIS):
             plv_tensor[sbj_index][i][i] = 0
     return plv_tensor
+
+def get_feature_matrix_vectorized(graph_index : int, data_path : str, use_thicks_myelins : bool = True, use_super_node : bool = False):
+    """
+    Feature Matrix for specific subject if 360 x 362 since PLV_vectors are 360
+    [CT_0   Myelin_0      PLV_vector_0.T      ]
+    [CT_1   Myelin_1      PLV_vector_1.T      ]
+    ...
+    [CT_359 Myelin_359    PLV_vector_359.T    ]
+
+    """
+    plv_matrix = np.load(os.path.join(data_path, "plv_tensor_592_sbj_filtered.npy"))
+    
+    plv_matrix = remove_self_loops(plv_matrix)
+
+    if use_super_node:
+        logging.info("Using Super Node")
+
+        plv_matrix_shifted = np.zeros((plv_matrix.shape[0], plv_matrix.shape[1]+1, plv_matrix.shape[2]+1))
+        plv_matrix_shifted[:,1:,1:] = plv_matrix
+        plv_matrix_shifted[:,0,:] = 1
+        plv_matrix_shifted[:,:,0] = 1
+        plv_matrix = plv_matrix_shifted
+
+
+    thicks_myelins_tensor = np.load(os.path.join(data_path, "cam_can_thicks_myelins_tensor_592_filtered.npy")) # 592 as well  
+    # Thicks Myelins is 2 x 592 x 360
+    # TODO: Make PLV Tensor and Thickness + Myelins Tensor global to avoid 
+    # constant loading
+    
+    plv_features = plv_tensor.copy()    
+    thick_features = thicks_myelins_tensor[THICK_INDEX]
+    myelin_features = thicks_myelins_tensor[MYELIN_INDEX][graph_index] 
+    feature_matrix = np.concatenate((thick_features[:,:,np.newaxis], myelin_features[:,:,np.newaxis], plv_features), axis=2)
+
+    thick_features[0][1]
+
+
+
+
+    
+    # logging.info("Using Myelination + PLV Matrix")
+    # feature_matrix = np.hstack((myelin_features, plv_features))
+    use_only_thicks = True
+    use_only_myelins = False
+    if use_only_thicks:
+        logging.info("Using CT + Identity Feature Matrix")
+        feature_matrix = np.hstack((thick_features, np.eye(NUM_ROIS)))
+    elif use_only_myelins:
+        logging.info("Using Myelination + Identity Feature Matrix")
+        feature_matrix = np.hstack((myelin_features, np.eye(NUM_ROIS)))
+    elif use_thicks_myelins:
+        logging.info("Using Myelination + PLV + CT Feature Matrix")
+        feature_matrix = np.hstack((myelin_features, plv_features, thick_features))
+        # logging.info("Using CT + Myelination + PLV  Feature Matrix")
+        # feature_matrix = np.hstack((thick_features, myelin_features, plv_features))
+    else:
+        logging.info("Using PLV Feature Matrix only")
+        # logging.info("Added Identity Matrix to Feature Matrix!")
+        # feature_matrix = np.hstack((plv_features, np.eye(NUM_ROIS)))
+        feature_matrix = plv_features
+    # TODO: Change back to correct feature matrix
+    # logging.info("Using CT + Myelination + Identity Feature Matrix")
+    # feature_matrix = np.hstack((thick_features, myelin_features, np.eye(NUM_ROIS)))
+    logging.info(f"Use Super Node : {use_super_node}")
+    if use_super_node:
+        # feature_matrix = np.eye(NUM_ROIS + 1)
+        num_rows, num_cols = feature_matrix.shape
+
+        # Create a new matrix with an extra row and an extra column
+        new_matrix = np.zeros((num_rows + 1, num_cols + 1), dtype=feature_matrix.dtype)
+
+        # Copy the elements from the original matrix to the new matrix
+        new_matrix[ : num_rows, : num_cols] = feature_matrix
+
+        # Set the bottom-right corner to 1
+        new_matrix[num_rows, num_cols] = 1
+        feature_matrix = new_matrix
+    # use_adj_matrix_powers = False
+    # def get_adjacency_matrix_powers():
+    #     adj_mat = get_adjacency_matrix_cam_can(graph_index, data_path)
+    #     shrink_factor = 0.4
+    #     return np.linalg.inv(np.eye(NUM_ROIS) - shrink_factor * adj_mat)
+
+    # if use_adj_matrix_powers:
+    #     logging.info("Using Adjacency Matrix Powers")
+
+    #     adj_mat_pow = get_adjacency_matrix_powers()
+    #     logging.info("Adj Mat Powers: {}".format(adj_mat_pow))
+    #     feature_matrix = np.hstack((thick_features, myelin_features, adj_mat_pow))
+        
+    # else:
+    #     feature_matrix = np.hstack((thick_features, myelin_features, np.eye(NUM_ROIS)))
+
+    # TODO: Check how CT + Identity changes if we don't use random noise
+    use_noise = False
+    if use_noise:
+        feature_matrix += np.random.normal(0, 0.01, size=feature_matrix.shape)
+    # if use_min_max_scaler:
+    #     feature_matrix = min_max_normalize(feature_matrix)
+    logging.info(f"Feature Matrix with No Noise: {feature_matrix}")
+    return feature_matrix
+
+def get_thick_features(graph_index : int, data_path : str):
+    thicks_myelins_tensor = np.load(os.path.join(data_path, "cam_can_thicks_myelins_tensor_592_filtered.npy"))
+    thick_features = thicks_myelins_tensor[THICK_INDEX][graph_index]
+    return thick_features
+
+def get_myelin_features(graph_index : int, data_path : str):
+    thicks_myelins_tensor = np.load(os.path.join(data_path, "cam_can_thicks_myelins_tensor_592_filtered.npy"))
+    myelin_features = thicks_myelins_tensor[MYELIN_INDEX][graph_index] 
+    return myelin_features
+
+
+
+
+
 
 def get_feature_matrix(graph_index : int, data_path : str, use_thicks_myelins : bool = True, use_super_node : bool = False):
     """
