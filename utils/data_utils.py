@@ -7,6 +7,15 @@ import networkx as nx
 import numpy as np
 import scipy.sparse as sp
 import torch
+import timeit
+import time
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.model_selection import train_test_split
+from collections import Counter
+
+
+
 
 from utils.constants_utils import FIVE_PERCENT_THRESHOLD
 import logging
@@ -599,22 +608,9 @@ def get_dataset_split_indices(num_sbjs) -> List[List[int]]:
     # logging.info("Using Only 18 - 30 Age Range")
     nth_index = 0
     nth_str = ["1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th"][nth_index]
-    # num_sbjs = 70
     num_sbjs = NUM_SBJS
-    # logging.info(f"Using Only {nth_str} {num_sbjs} Subjects")
-    # TODO: Change Back to 587
     train_num, val_num = int(num_sbjs * TRAIN_SPLIT), int(num_sbjs * VAL_SPLIT)
     test_num = num_sbjs - train_num - val_num 
-    # TODO: RESTORE BACK TO 100 % ONCE DONE TESTING SUBSET! 
-    # logging.info("Using only 10% of the data for training, validation and testing")
-    # train_num = train_num // 10
-    # val_num = val_num // 10
-    # test_num = test_num // 10
-    
-    # print("Using only one tenth of the data for training, validation and testing")
-    # print("Train Num: ", train_num)
-    # print("Val Num: ", val_num)
-    # print("Test Num: ", test_num)
 
     seen = set()
     lower_bound = num_sbjs * nth_index
@@ -646,53 +642,14 @@ def get_adjacency_matrix_cam_can(threshold : float, graph_index : int, data_path
     plv_tensor = remove_self_loops(plv_tensor)
     plv_matrix = plv_tensor[graph_index].copy()
     
-    # logging.info(f"USING HIGHEST HIDDEN LAYER YET 1024")
     logging.info(f"Using PLV Threshold : {threshold}")
     plv_matrix [plv_matrix < threshold] = 0
     plv_matrix [plv_matrix >= threshold] = 1
     
-    # add_probability = 0.75    
-    # # logging.info(f"Hierarchy Test: With some probability p = {add_probability}, Add edges from ROI vectors that correspond to ACMP/DP")
-    # logging.info(f"Hierarchy Test: With some probability p = {add_probability}, Remove edges from ROI vectors that correspond to MT/LT")
-    # logging.info("PREVIOUS ADJACENCY MATRIX: \n {}".format(plv_matrix))
-    # ACMP_SUBNET_ID = 19
-    # DP_SUBNET_ID = 22
-    # MT_ID = 13
-    # LT_ID = 14
-    # from visualization import get_hcp_atlas_df
-    # hcp_atlas_df = get_hcp_atlas_df()
-    # cortex_ids = hcp_atlas_df['Cortex_ID']
-    # for i in range(NUM_ROIS):
-    #     if cortex_ids[i] == ACMP_SUBNET_ID:
-    #         # NOTE : Binarized matrix might already have 1's at [i][j]
-    #         for j in range(NUM_ROIS):
-    #             # if plv_matrix[i][j] == 1:
-    #             #     if np.random.uniform() < add_probability:
-    #             #         plv_matrix[i][j] = 0
-    #             #         plv_matrix[j][i] = 0    
-    #             if not plv_matrix[i][j]:
-    #                 if np.random.uniform() < add_probability:
-    #                     plv_matrix[i][j] = 1
-    #                     plv_matrix[j][i] = 1
-    # logging.info("ADJACENCY MATRIX AFTER ADDING: \n {}".format(plv_matrix))
     if use_super_node:
+        #plv matrix is shaped num_subjs x rois x rois. Adding a supernode at the end will increase dimension to rois+1
+        plv_matrix = create_super_node(plv_matrix)
         logging.info("Using Super Node")
-
-        #dimitrios:
-        plv_matrix_shifted = np.zeros((plv_matrix.shape[0], plv_matrix.shape[1]+1, plv_matrix.shape[2]+1))
-        plv_matrix_shifted[:,1:,1:] = plv_matrix
-        plv_matrix_shifted[:,0,:] = 1
-        plv_matrix_shifted[:,:,0] = 1
-        plv_matrix = plv_matrix_shifted
-
-        #this is wrong
-        #logging.info("Using Super Node")
-        #plv_matrix = np.insert(plv_matrix, 0, 1, axis = 0)
-        #plv_matrix = np.insert(plv_matrix, 0, 1, axis = 1)
-        #plv_matrix[-1] = [1] * len(plv_matrix)
-        #for i in range(len(plv_matrix)):
-        #    plv_matrix[i][-1] = 1
-        #plv_matrix[-1][-1] = 0
 
     return plv_matrix
 
@@ -770,49 +727,49 @@ def get_adj_mat_dataset_splits_with_features_and_age_labels_and_indices_for_bina
             test_split_indices]
 
 
-def get_adj_mat_dataset_splits_with_features_and_age_labels_and_indices(threshold : float, num_sbjs : int, data_path : str, use_thicks_myelins : bool, use_super_node : bool):
-    
-    train_num, val_num = int(num_sbjs * TRAIN_SPLIT), int(num_sbjs * VAL_SPLIT)
-    test_num = num_sbjs - train_num - val_num 
-    assert train_num + val_num + test_num == num_sbjs, "Must add to total number of subjects"
-    train_split_indices, val_split_indices, test_split_indices = get_dataset_split_indices(num_sbjs)
-    # NOTE: Using subset of data for now to test and fix clumping issue, will use full dataset once clumping issue is fixed
-    # UPDATE: Seem to have fixed issue! Now using full dataset
-    # train_split_indices, val_split_indices, test_split_indices = [0, 100, 200, 300, 400, 500], [50, 250, 450], [125, 525]
-    # import logging
-    # logging.info("Using 5 Graphs")
-    # train_split_indices, val_split_indices, test_split_indices = [100, 100, 100, 100, 100], [100, 100, 100], [100, 100]
-    # train_split_indices, val_split_indices, test_split_indices = [100, 100, 100], [100], [100]
-    # train_split_indices, val_split_indices, test_split_indices = [0, 100, 200, 300, 400, 500], [50, 250, 450], [125, 525]
-    
+def get_adj_mat_dataset_splits_with_features_and_age_labels_and_indices(threshold : float, num_sbjs : int, data_path : str, use_plv_matrix : bool = False, use_super_node : bool = False, use_thickness : bool = False, use_myelins : bool = False):
+    #loads the MEG adjacency matrices and thickness and myelin labels and returns the train/val/test splits of the data
 
-    # TODO: Remove this once hierarchy testing is complete!
-    # Must ensure same adjacency matrix with additional edges fed into model for each split to test hierarchy changes
-    # logging.info("Using same adjacency matrix to test Hierarchy Changes!")
-    # adjacency_matrix = get_adjacency_matrix_cam_can(100, data_path, use_super_node)
-    # train_split_adj_matrices = [adjacency_matrix for _ in train_split_indices]
-    # val_split_adj_matrices = [adjacency_matrix for _ in val_split_indices]
-    # test_split_adj_matrices = [adjacency_matrix for _ in test_split_indices]
+    # Initialize the random number generator with a fixed seed
+    seed_value = 42
 
+    #use age labels to stratify train/val/test across decades
+    age_labels = np.load(os.path.join(data_path, "age_labels_592_sbj_filtered.npy"))
+    age_decades = np.int16(age_labels//10) #floor operation in age
+    age_decades[age_decades==1]=2 #move 1st decade to 2nd dacade because of too few measurements
+
+    # First split (train + remaining)
+    subjects_list = list(range(num_sbjs))
+    train_split_indices, temp_split_indices = train_test_split(subjects_list, stratify=age_decades, test_size=1-TRAIN_SPLIT, random_state=seed_value)
+    # Second split: validation and test from the temporary set
+    TEST_SPLIT = 1-TRAIN_SPLIT-VAL_SPLIT
+    val_split_indices, test_split_indices = train_test_split(temp_split_indices, stratify=age_decades[temp_split_indices], test_size=TEST_SPLIT / (1-TRAIN_SPLIT), random_state=seed_value)
+
+    #show age decades of train/val/test groups (should be balanced)
+    dec = Counter(age_decades[train_split_indices])
+    logging.info(f"Train split - Dec 2: {dec[2]}, Dec 3: {dec[3]}, Dec 4: {dec[4]}, Dec 5: {dec[5]}, Dec 6: {dec[6]}, Dec 7: {dec[7]}, Dec 8: {dec[8]}")
+    dec = Counter(age_decades[val_split_indices])
+    logging.info(f"Val split - Dec 2: {dec[2]}, Dec 3: {dec[3]}, Dec 4: {dec[4]}, Dec 5: {dec[5]}, Dec 6: {dec[6]}, Dec 7: {dec[7]}, Dec 8: {dec[8]}")
+    dec = Counter(age_decades[test_split_indices])
+    logging.info(f"Test split - Dec 2: {dec[2]}, Dec 3: {dec[3]}, Dec 4: {dec[4]}, Dec 5: {dec[5]}, Dec 6: {dec[6]}, Dec 7: {dec[7]}, Dec 8: {dec[8]}")
+    
     #load all plv data at once
-    adj_matrices = get_adjacency_matrix_cam_can(threshold, range(num_sbjs), data_path, use_super_node)
+    adj_matrices = get_adjacency_matrix_cam_can(threshold, range(num_sbjs), data_path, use_super_node=use_super_node)
    
     #train, val, test adj matrices
     train_split_adj_matrices = adj_matrices[train_split_indices]
     val_split_adj_matrices = adj_matrices[val_split_indices]
     test_split_adj_matrices = adj_matrices[test_split_indices]
-
-    feats = get_feature_matrix_vectorized(range(num_sbjs), data_path, use_thicks_myelins, use_super_node)
     
-    train_feats = [get_feature_matrix(i, data_path, use_thicks_myelins, use_super_node) for i in train_split_indices]
-    val_feats = [get_feature_matrix(i, data_path, use_thicks_myelins, use_super_node) for i in val_split_indices]
-    test_feats = [get_feature_matrix(i, data_path, use_thicks_myelins, use_super_node) for i in test_split_indices]
+    feats = get_feature_matrix(data_path, use_plv_matrix=use_plv_matrix, use_super_node=use_super_node, use_thickness=use_thickness, use_myelins=use_myelins)
+    train_feats = feats[train_split_indices]
+    val_feats = feats[val_split_indices]
+    test_feats = feats[test_split_indices]
 
-    age_labels = np.load(os.path.join(data_path, "age_labels_592_sbj_filtered.npy"))
-    train_age_labels = [age_labels[i] for i in train_split_indices]
-    val_age_labels = [age_labels[i] for i in val_split_indices]
-    test_age_labels = [age_labels[i] for i in test_split_indices]
-
+    train_age_labels = age_labels[train_split_indices]
+    val_age_labels = age_labels[val_split_indices]
+    test_age_labels = age_labels[test_split_indices]
+    
     return [train_split_adj_matrices, 
             train_feats, 
             train_age_labels,
@@ -882,106 +839,67 @@ def remove_self_loops(plv_tensor):
             plv_tensor[sbj_index][i][i] = 0
     return plv_tensor
 
-def get_feature_matrix_vectorized(graph_index : int, data_path : str, use_thicks_myelins : bool = True, use_super_node : bool = False):
+def get_feature_matrix(data_path : str, use_plv_matrix : bool = True, use_super_node : bool = False, use_thickness : bool = True, use_myelins : bool = True):
     """
-    Feature Matrix for specific subject if 360 x 362 since PLV_vectors are 360
+    Feature matrix for a specific subject will be 360 x 362, where 360 is the number of brain ROIs.
     [CT_0   Myelin_0      PLV_vector_0.T      ]
     [CT_1   Myelin_1      PLV_vector_1.T      ]
     ...
     [CT_359 Myelin_359    PLV_vector_359.T    ]
-
+    If use_plv_matrix is False, the matrix will be replaced with identity matrix (one-hot encoding)
+    If use_thickness or use_myelins are False, the corresponding dimesion will not be included and the result 
+    will be [CT PLV_vector], [Myelin PLV_vector], or just [PLV_vector]
+    If using the PLV matrix and a supernode, the dimensions will increase by one, 360->361, and the super node will be added
+    as the last node
     """
-    plv_matrix = np.load(os.path.join(data_path, "plv_tensor_592_sbj_filtered.npy"))
-    
-    plv_matrix = remove_self_loops(plv_matrix)
 
-    if use_super_node:
-        logging.info("Using Super Node")
-
-        plv_matrix_shifted = np.zeros((plv_matrix.shape[0], plv_matrix.shape[1]+1, plv_matrix.shape[2]+1))
-        plv_matrix_shifted[:,1:,1:] = plv_matrix
-        plv_matrix_shifted[:,0,:] = 1
-        plv_matrix_shifted[:,:,0] = 1
-        plv_matrix = plv_matrix_shifted
-
-
-    thicks_myelins_tensor = np.load(os.path.join(data_path, "cam_can_thicks_myelins_tensor_592_filtered.npy")) # 592 as well  
-    # Thicks Myelins is 2 x 592 x 360
-    # TODO: Make PLV Tensor and Thickness + Myelins Tensor global to avoid 
-    # constant loading
-    
-    plv_features = plv_tensor.copy()    
-    thick_features = thicks_myelins_tensor[THICK_INDEX]
-    myelin_features = thicks_myelins_tensor[MYELIN_INDEX][graph_index] 
-    feature_matrix = np.concatenate((thick_features[:,:,np.newaxis], myelin_features[:,:,np.newaxis], plv_features), axis=2)
-
-    thick_features[0][1]
-
-
-
-
-    
-    # logging.info("Using Myelination + PLV Matrix")
-    # feature_matrix = np.hstack((myelin_features, plv_features))
-    use_only_thicks = True
-    use_only_myelins = False
-    if use_only_thicks:
-        logging.info("Using CT + Identity Feature Matrix")
-        feature_matrix = np.hstack((thick_features, np.eye(NUM_ROIS)))
-    elif use_only_myelins:
-        logging.info("Using Myelination + Identity Feature Matrix")
-        feature_matrix = np.hstack((myelin_features, np.eye(NUM_ROIS)))
-    elif use_thicks_myelins:
-        logging.info("Using Myelination + PLV + CT Feature Matrix")
-        feature_matrix = np.hstack((myelin_features, plv_features, thick_features))
-        # logging.info("Using CT + Myelination + PLV  Feature Matrix")
-        # feature_matrix = np.hstack((thick_features, myelin_features, plv_features))
+    #load plv_features or create one-hot vectors
+    if use_plv_matrix:            
+        #load plv matrices
+        plv_matrix = np.load(os.path.join(data_path, "plv_tensor_592_sbj_filtered.npy"))
+        #remove self loops
+        plv_matrix = remove_self_loops(plv_matrix)
+        logging.info("Including PLV as node features")
+        #use supernode
+        if use_super_node:
+            #plv matrix is shaped num_subjs x rois x rois. Adding a supernode at the end will increase dimension to rois+1
+            plv_matrix = create_super_node(plv_matrix)
+            logging.info("Using Super Node")
+        feature_matrix = plv_matrix
     else:
-        logging.info("Using PLV Feature Matrix only")
-        # logging.info("Added Identity Matrix to Feature Matrix!")
-        # feature_matrix = np.hstack((plv_features, np.eye(NUM_ROIS)))
-        feature_matrix = plv_features
-    # TODO: Change back to correct feature matrix
-    # logging.info("Using CT + Myelination + Identity Feature Matrix")
-    # feature_matrix = np.hstack((thick_features, myelin_features, np.eye(NUM_ROIS)))
-    logging.info(f"Use Super Node : {use_super_node}")
-    if use_super_node:
-        # feature_matrix = np.eye(NUM_ROIS + 1)
-        num_rows, num_cols = feature_matrix.shape
+        feature_matrix = np.tile(np.eye(NUM_ROIS),(NUM_SBJS, 1, 1)) #tile one-hot matrix for all subjects
+        logging.info("Including one-hot encoding as node features")
 
-        # Create a new matrix with an extra row and an extra column
-        new_matrix = np.zeros((num_rows + 1, num_cols + 1), dtype=feature_matrix.dtype)
+    #concatenate thickness and myelin features
+    if use_thickness or use_myelins:
+        thick_features, myelin_features = np.load(os.path.join(data_path, "cam_can_thicks_myelins_tensor_592_filtered.npy")) # 
+        #Thicks/Myelins are num_sbjs x number of nodes (360)
+        #append a dimension with 0 if using supernode (361)
+        if use_super_node:
+            thick_features = np.concatenate((thick_features,np.zeros((NUM_SBJS,1))), axis=1)
+            myelin_features = np.concatenate((myelin_features,np.zeros((NUM_SBJS,1))), axis=1) 
+        # Thicks/Myelins are num_sbjs x number of nodes (360)
+        # concatenate features in order: [cortical thickness x myelin x plv_matrix]
+        if use_myelins:
+            feature_matrix = np.concatenate((myelin_features[:,:,np.newaxis], feature_matrix), axis=2)
+            logging.info("Including cortical thickness as features")
+        if use_thickness:
+            feature_matrix = np.concatenate((thick_features[:,:,np.newaxis], feature_matrix), axis=2)
+            logging.info("Including neuron myelination as features")
 
-        # Copy the elements from the original matrix to the new matrix
-        new_matrix[ : num_rows, : num_cols] = feature_matrix
-
-        # Set the bottom-right corner to 1
-        new_matrix[num_rows, num_cols] = 1
-        feature_matrix = new_matrix
-    # use_adj_matrix_powers = False
-    # def get_adjacency_matrix_powers():
-    #     adj_mat = get_adjacency_matrix_cam_can(graph_index, data_path)
-    #     shrink_factor = 0.4
-    #     return np.linalg.inv(np.eye(NUM_ROIS) - shrink_factor * adj_mat)
-
-    # if use_adj_matrix_powers:
-    #     logging.info("Using Adjacency Matrix Powers")
-
-    #     adj_mat_pow = get_adjacency_matrix_powers()
-    #     logging.info("Adj Mat Powers: {}".format(adj_mat_pow))
-    #     feature_matrix = np.hstack((thick_features, myelin_features, adj_mat_pow))
-        
-    # else:
-    #     feature_matrix = np.hstack((thick_features, myelin_features, np.eye(NUM_ROIS)))
-
-    # TODO: Check how CT + Identity changes if we don't use random noise
-    use_noise = False
-    if use_noise:
-        feature_matrix += np.random.normal(0, 0.01, size=feature_matrix.shape)
-    # if use_min_max_scaler:
-    #     feature_matrix = min_max_normalize(feature_matrix)
-    logging.info(f"Feature Matrix with No Noise: {feature_matrix}")
     return feature_matrix
+
+def create_super_node(plv_matrix):
+    #creates a super node in network adjacency matrices
+    #input plv_matrix is n_subjects x n_roi x n_roi
+    if plv_matrix.ndim == 2: 
+        plv_matrix = plv_matrix[np.newaxis,:,:] #if n_roi x n_roi, make 1 x n_roi x n_roi
+    plv_matrix_supernode = np.zeros((plv_matrix.shape[0], plv_matrix.shape[1]+1, plv_matrix.shape[2]+1))
+    plv_matrix_supernode[:,:-1,:-1] = plv_matrix
+    plv_matrix_supernode[:,-1,:] = 1
+    plv_matrix_supernode[:,:,-1] = 1
+    return plv_matrix_supernode
+    
 
 def get_thick_features(graph_index : int, data_path : str):
     thicks_myelins_tensor = np.load(os.path.join(data_path, "cam_can_thicks_myelins_tensor_592_filtered.npy"))
@@ -993,12 +911,7 @@ def get_myelin_features(graph_index : int, data_path : str):
     myelin_features = thicks_myelins_tensor[MYELIN_INDEX][graph_index] 
     return myelin_features
 
-
-
-
-
-
-def get_feature_matrix(graph_index : int, data_path : str, use_thicks_myelins : bool = True, use_super_node : bool = False):
+def get_feature_matrix_obsolete(graph_index : int, data_path : str, use_thicks_myelins : bool = True, use_super_node : bool = False):
     """
     Feature Matrix for specific subject if 360 x 362 since PLV_vectors are 360
     [CT_0   Myelin_0      PLV_vector_0.T      ]

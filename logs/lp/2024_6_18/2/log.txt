@@ -7,3 +7,5 @@ INFO:root:Use CT + Myelination : False
 INFO:root:Step Size for Reduction Factor (Gamma) for learning rate : None
 INFO:root:Reduction Factor (Gamma) for learning rate : 0.5
 INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Including one-hot encoding as node features
+INFO:root:Including one-hot encoding as node features
