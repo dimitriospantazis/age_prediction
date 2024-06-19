@@ -63,15 +63,17 @@ def train(args):
     # Load data
     # TODO: Check how using supernode changes FULL 592 CAMCAN results : NOTE: Does not change much
     args.use_super_node = False
-    args.use_thicks_myelins = False
+    #args.use_thickness_myelins = False
+    args.use_thickness = False
+    args.use_myelins = False
     # args.use_margin_loss = True
-    # TODO: Check how using MSE Loss with HGCN Model compares to FHNN and Cole Code
     args.use_margin_loss = True
     args.use_batch_learning = True
     logging.info("Use Super Node : {}".format(args.use_super_node))
     logging.info("Use Batch Learning : {}".format(args.use_batch_learning))
     logging.info("Use Margin Loss : {}".format(args.use_margin_loss))
-    logging.info("Use CT + Myelination : {}".format(args.use_thicks_myelins))
+    logging.info("Use Cortical Thickness: {}".format(args.use_thickness))
+    logging.info("Use Myelination : {}".format(args.use_myelins))
     logging.info("Step Size for Reduction Factor (Gamma) for learning rate : {}".format(args.lr_reduce_freq))
     logging.info("Reduction Factor (Gamma) for learning rate : {}".format(args.gamma))
     data = load_data(args, os.path.join(os.environ['DATAPATH'], args.dataset))

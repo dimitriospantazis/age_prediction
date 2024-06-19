@@ -1,0 +1,2 @@
+INFO:root:Using: cpu
+INFO:root:Using seed 1234.

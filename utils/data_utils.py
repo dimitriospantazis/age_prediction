@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 from collections import Counter
-
+from tqdm import tqdm
 
 
 
@@ -40,10 +40,10 @@ NUM_SBJS = TOTAL_SBJS - 5 # 587 subjects after filtering out numerically unstabl
 
 def load_data(args, datapath):
     if args.dataset == 'cam_can_multiple' or args.dataset == 'binary_cyclic_tree_multiple' or args.dataset == 'meg':
-        data = load_data_lp(args.dataset, args.use_feats, datapath, args.use_super_node, args.use_thicks_myelins, threshold = args.threshold)
+        data = load_data_lp(args.dataset, args.use_feats, datapath, use_super_node=args.use_super_node, use_thickness=args.use_thickness, use_myelins=args.use_myelins, threshold = args.threshold)
 
         for graph_data_dicts in data.values():
-            for graph_data in graph_data_dicts:
+            for graph_data in tqdm(graph_data_dicts):
                 adj = graph_data['adj_train']
                 
                 adj_train, train_edges, train_edges_false, val_edges, val_edges_false, test_edges, test_edges_false = mask_edges(
@@ -204,7 +204,7 @@ def add_super_node_to_adjacency_matrix(adj):
     adj_matrix[-1][-1] = 0
     return adj_matrix
 
-def load_data_lp(dataset : str, use_feats : bool, data_path : str, use_super_node : bool =False, use_thicks_myelins : bool =True, 
+def load_data_lp(dataset : str, use_feats : bool, data_path : str, use_super_node : bool =False, use_thickness: bool = False, use_myelins : bool =True, 
                 threshold : float =1000.0, sbj_index : int = 0):
     if dataset in ['cora', 'pubmed']:
         adj, features = load_citation_data(dataset, use_feats, data_path)[:2]
@@ -420,9 +420,9 @@ def load_data_lp(dataset : str, use_feats : bool, data_path : str, use_super_nod
             else: features = np.eye(NUM_ROIS)
         adj = sp.csr_matrix(adj_mat)
     elif dataset == 'cam_can_multiple':
-        train_graph_data_dicts, val_graph_data_dicts, test_graph_data_dicts = load_data_cam_can_new(threshold, NUM_SBJS, data_path, use_thicks_myelins, use_super_node)
+        train_graph_data_dicts, val_graph_data_dicts, test_graph_data_dicts = load_data_cam_can_new(threshold, NUM_SBJS, data_path, use_thickness, use_myelins, use_super_node)
     elif dataset == 'meg':
-        train_graph_data_dicts, val_graph_data_dicts, test_graph_data_dicts = load_data_meg(NUM_SBJS_MEG, data_path, use_thicks_myelins, use_super_node)
+        train_graph_data_dicts, val_graph_data_dicts, test_graph_data_dicts = load_data_meg(NUM_SBJS_MEG, data_path, use_thickness_myelins, use_super_node)
     elif dataset == 'binary_cyclic_tree_multiple':
         train_graph_data_dicts, val_graph_data_dicts, test_graph_data_dicts = load_data_binary_cyclic_tree_multiple(NUM_SBJS, data_path)
     else:
@@ -438,7 +438,7 @@ def load_data_lp(dataset : str, use_feats : bool, data_path : str, use_super_nod
     
     return data
 
-def load_data_cam_can_new(threshold : float, num_sbjs : int, data_path : str, use_thicks_myelins : bool, use_super_node : bool):
+def load_data_cam_can_new(threshold : float, num_sbjs : int, data_path : str, use_thickness : bool, use_myelins : bool, use_super_node : bool):
     # ADJ MAT
     # 360 x 360
     # FEATURES 592 x 2 x 360
@@ -458,7 +458,7 @@ def load_data_cam_can_new(threshold : float, num_sbjs : int, data_path : str, us
         test_adj_matrices, 
         test_feats,
         test_age_labels,
-        test_split_indices] = get_adj_mat_dataset_splits_with_features_and_age_labels_and_indices(threshold, num_sbjs, data_path, use_thicks_myelins, use_super_node)
+        test_split_indices] = get_adj_mat_dataset_splits_with_features_and_age_labels_and_indices(threshold, num_sbjs, data_path, use_thickness=use_thickness, use_myelins=use_myelins, use_super_node=use_super_node)
     
     train_graph_data_dicts = [{'adj_train': sp.csr_matrix(train_adj), 
                                 'features': train_feat,
@@ -481,7 +481,7 @@ def load_data_cam_can_new(threshold : float, num_sbjs : int, data_path : str, us
 
     return train_graph_data_dicts, val_graph_data_dicts, test_graph_data_dicts
 
-def load_data_meg(num_sbjs : int, data_path : str, use_thicks_myelins : bool, use_super_node : bool):
+def load_data_meg(num_sbjs : int, data_path : str, use_thickness_myelins : bool, use_super_node : bool):
     # ADJ MAT
     # 90 x 90
     # FEATURES Identity Matrix
@@ -501,7 +501,7 @@ def load_data_meg(num_sbjs : int, data_path : str, use_thicks_myelins : bool, us
         test_adj_matrices, 
         test_feats,
         test_age_labels,
-        test_split_indices] = get_adj_mat_dataset_splits_with_features_and_age_labels_and_indices_meg(num_sbjs, data_path, use_thicks_myelins, use_super_node)
+        test_split_indices] = get_adj_mat_dataset_splits_with_features_and_age_labels_and_indices_meg(num_sbjs, data_path, use_thickness_myelins, use_super_node)
     
     train_graph_data_dicts = [{'adj_train': sp.csr_matrix(train_adj), 
                                 'features': train_feat,
@@ -649,6 +649,8 @@ def get_adjacency_matrix_cam_can(threshold : float, graph_index : int, data_path
     if use_super_node:
         #plv matrix is shaped num_subjs x rois x rois. Adding a supernode at the end will increase dimension to rois+1
         plv_matrix = create_super_node(plv_matrix)
+        #plv matrix is shaped num_subjs x rois x rois. Adding a supernode at the end will increase dimension to rois+1
+        plv_matrix = create_super_node(plv_matrix)
         logging.info("Using Super Node")
 
     return plv_matrix
@@ -745,6 +747,12 @@ def get_adj_mat_dataset_splits_with_features_and_age_labels_and_indices(threshol
     TEST_SPLIT = 1-TRAIN_SPLIT-VAL_SPLIT
     val_split_indices, test_split_indices = train_test_split(temp_split_indices, stratify=age_decades[temp_split_indices], test_size=TEST_SPLIT / (1-TRAIN_SPLIT), random_state=seed_value)
 
+    #TODO: to remove, smaller data to debug
+    train_split_indices = train_split_indices[:20]
+    val_split_indices = val_split_indices[:5]
+    test_split_indices = test_split_indices[:5]
+    
+
     #show age decades of train/val/test groups (should be balanced)
     dec = Counter(age_decades[train_split_indices])
     logging.info(f"Train split - Dec 2: {dec[2]}, Dec 3: {dec[3]}, Dec 4: {dec[4]}, Dec 5: {dec[5]}, Dec 6: {dec[6]}, Dec 7: {dec[7]}, Dec 8: {dec[8]}")
@@ -783,7 +791,7 @@ def get_adj_mat_dataset_splits_with_features_and_age_labels_and_indices(threshol
             test_age_labels,
             test_split_indices]
 
-def get_adj_mat_dataset_splits_with_features_and_age_labels_and_indices_meg(num_sbjs : int, data_path : str, use_thicks_myelins : bool, use_super_node : bool):
+def get_adj_mat_dataset_splits_with_features_and_age_labels_and_indices_meg(num_sbjs : int, data_path : str, use_thickness_myelins : bool, use_super_node : bool):
     
     train_num, val_num = int(num_sbjs * TRAIN_SPLIT), int(num_sbjs * VAL_SPLIT)
     test_num = num_sbjs - train_num - val_num 
@@ -911,7 +919,7 @@ def get_myelin_features(graph_index : int, data_path : str):
     myelin_features = thicks_myelins_tensor[MYELIN_INDEX][graph_index] 
     return myelin_features
 
-def get_feature_matrix_obsolete(graph_index : int, data_path : str, use_thicks_myelins : bool = True, use_super_node : bool = False):
+def get_feature_matrix_obsolete(graph_index : int, data_path : str, use_thickness_myelins : bool = True, use_super_node : bool = False):
     """
     Feature Matrix for specific subject if 360 x 362 since PLV_vectors are 360
     [CT_0   Myelin_0      PLV_vector_0.T      ]
@@ -960,7 +968,7 @@ def get_feature_matrix_obsolete(graph_index : int, data_path : str, use_thicks_m
     elif use_only_myelins:
         logging.info("Using Myelination + Identity Feature Matrix")
         feature_matrix = np.hstack((myelin_features, np.eye(NUM_ROIS)))
-    elif use_thicks_myelins:
+    elif use_thickness_myelins:
         logging.info("Using Myelination + PLV + CT Feature Matrix")
         feature_matrix = np.hstack((myelin_features, plv_features, thick_features))
         # logging.info("Using CT + Myelination + PLV  Feature Matrix")

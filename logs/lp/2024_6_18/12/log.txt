@@ -1,0 +1,5 @@
+INFO:root:Using: cpu
+INFO:root:Using seed 1234.
+INFO:root:Use Super Node : False
+INFO:root:Use Batch Learning : True
+INFO:root:Use Margin Loss : True

@@ -1,0 +1,54 @@
+INFO:root:Using: cpu
+INFO:root:Using seed 1234.
+INFO:root:Use Super Node : False
+INFO:root:Use Batch Learning : True
+INFO:root:Use Margin Loss : True
+INFO:root:Use Cortical Thickness: False
+INFO:root:Use Myelination : False
+INFO:root:Step Size for Reduction Factor (Gamma) for learning rate : None
+INFO:root:Reduction Factor (Gamma) for learning rate : 0.5
+INFO:root:Train split - Dec 2: 47, Dec 3: 59, Dec 4: 72, Dec 5: 59, Dec 6: 69, Dec 7: 65, Dec 8: 39
+INFO:root:Val split - Dec 2: 13, Dec 3: 17, Dec 4: 21, Dec 5: 17, Dec 6: 19, Dec 7: 19, Dec 8: 11
+INFO:root:Test split - Dec 2: 7, Dec 3: 9, Dec 4: 10, Dec 5: 9, Dec 6: 10, Dec 7: 9, Dec 8: 6
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Including one-hot encoding as node features
+INFO:root:LPModel(
+  (manifold): Lorentz manifold
+  (encoder): HyboNet(
+    (manifold): Lorentz manifold
+    (layers): Sequential(
+      (0): LorentzGraphConvolution(
+        (linear): LorentzLinear(
+          (manifold): Lorentz manifold
+          (weight): Linear(in_features=361, out_features=24, bias=True)
+          (dropout): Dropout(p=0.25, inplace=False)
+        )
+        (agg): LorentzAgg(
+          (manifold): Lorentz manifold
+        )
+      )
+      (1): LorentzGraphConvolution(
+        (linear): LorentzLinear(
+          (manifold): Lorentz manifold
+          (weight): Linear(in_features=24, out_features=3, bias=True)
+          (dropout): Dropout(p=0.25, inplace=False)
+        )
+        (agg): LorentzAgg(
+          (manifold): Lorentz manifold
+        )
+      )
+    )
+  )
+  (dc): FermiDiracDecoder()
+  (loss): MarginLoss()
+)
+INFO:root:Number of Train Graph Data Dicts in List: 410
+INFO:root:Number of Validation Graph Data Dicts in List: 117
+INFO:root:Number of Test Graph Data Dicts in List: 60
+INFO:root:Train Subject Indices [34, 305, 15, 8, 169, 287, 123, 377, 180, 307, 384, 577, 491, 186, 219, 13, 494, 472, 132, 197, 547, 292, 155, 195, 344, 447, 116, 323, 528, 290, 266, 496, 414, 485, 495, 221, 571, 79, 513, 216, 395, 420, 422, 570, 242, 373, 254, 475, 345, 461, 227, 352, 149, 462, 474, 490, 374, 25, 367, 564, 16, 70, 95, 133, 273, 236, 33, 175, 105, 110, 42, 208, 59, 9, 178, 156, 520, 252, 442, 47, 552, 158, 279, 136, 313, 436, 301, 430, 489, 11, 386, 24, 479, 223, 201, 421, 80, 350, 92, 271, 349, 28, 413, 314, 468, 167, 115, 288, 277, 407, 416, 332, 428, 76, 139, 129, 87, 580, 525, 567, 7, 540, 230, 267, 187, 400, 249, 560, 522, 418, 286, 231, 234, 192, 316, 543, 469, 310, 151, 163, 342, 159, 317, 466, 111, 473, 272, 204, 75, 406, 217, 102, 99, 165, 341, 46, 93, 545, 49, 409, 568, 503, 480, 488, 565, 500, 551, 509, 19, 326, 549, 90, 346, 54, 524, 295, 453, 232, 499, 425, 134, 170, 60, 31, 393, 291, 126, 299, 578, 434, 402, 359, 510, 312, 338, 157, 154, 32, 484, 530, 335, 391, 411, 107, 122, 48, 112, 382, 255, 211, 523, 518, 372, 89, 390, 222, 246, 251, 318, 433, 61, 465, 410, 514, 58, 17, 337, 417, 388, 27, 325, 449, 209, 69, 401, 94, 67, 198, 398, 572, 259, 147, 583, 274, 445, 121, 426, 261, 369, 282, 533, 334, 432, 98, 152, 4, 162, 228, 438, 203, 558, 100, 106, 6, 351, 247, 512, 57, 559, 114, 83, 459, 120, 534, 515, 131, 44, 507, 164, 368, 40, 97, 65, 117, 364, 542, 556, 194, 336, 340, 206, 361, 504, 148, 72, 450, 189, 537, 399, 521, 412, 12, 471, 300, 403, 82, 476, 137, 37, 370, 441, 281, 293, 585, 308, 265, 50, 424, 53, 229, 561, 320, 574, 141, 501, 529, 5, 237, 360, 250, 448, 71, 193, 419, 78, 575, 166, 0, 392, 319, 29, 30, 225, 328, 202, 258, 581, 330, 304, 135, 212, 378, 455, 506, 177, 519, 101, 457, 214, 181, 429, 366, 365, 440, 36, 563, 498, 183, 119, 550, 385, 467, 546, 145, 213, 26, 41, 460, 302, 233, 215, 257, 439, 333, 408, 124, 358, 327, 329, 276, 437, 179, 444, 511, 502, 188, 477, 298, 3, 45, 297, 173, 415, 517, 161, 196, 160, 184, 86, 309]
+INFO:root:Validation Subject Indices [536, 91, 103, 171, 263, 108, 199, 73, 77, 357, 62, 253, 280, 404, 244, 527, 172, 174, 487, 397, 2, 451, 238, 224, 531, 96, 235, 14, 573, 579, 264, 55, 245, 218, 380, 226, 85, 353, 220, 56, 348, 125, 182, 452, 486, 146, 142, 176, 381, 138, 396, 205, 356, 10, 389, 241, 104, 482, 22, 371, 1, 269, 285, 539, 554, 505, 296, 435, 143, 454, 260, 508, 446, 394, 256, 463, 18, 248, 21, 478, 262, 516, 243, 200, 278, 483, 127, 584, 239, 289, 470, 68, 464, 375, 347, 64, 379, 532, 66, 38, 481, 586, 562, 443, 553, 343, 538, 74, 376, 191, 566, 569, 84, 81, 321, 270, 210]
+INFO:root:Test Subject Indices [88, 109, 150, 128, 190, 387, 207, 405, 51, 497, 294, 493, 283, 284, 339, 130, 354, 23, 315, 153, 113, 311, 43, 322, 526, 39, 458, 555, 427, 492, 306, 63, 431, 52, 548, 576, 363, 20, 582, 168, 303, 383, 331, 144, 324, 535, 456, 362, 355, 185, 423, 140, 557, 541, 275, 544, 268, 240, 35, 118]
+INFO:root:Total number of parameters: 8767.0
+INFO:root:Total number of parameters: 8767.0
+INFO:root:Max Number of Epochs : 150
+INFO:root:Using batch learning index to embeddings dict for training

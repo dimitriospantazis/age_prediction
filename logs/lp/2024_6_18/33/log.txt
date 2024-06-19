@@ -1,0 +1,14 @@
+INFO:root:Using: cpu
+INFO:root:Using seed 1234.
+INFO:root:Use Super Node : False
+INFO:root:Use Batch Learning : True
+INFO:root:Use Margin Loss : True
+INFO:root:Use Cortical Thickness: False
+INFO:root:Use Myelination : False
+INFO:root:Step Size for Reduction Factor (Gamma) for learning rate : None
+INFO:root:Reduction Factor (Gamma) for learning rate : 0.5
+INFO:root:Train split - Dec 2: 4, Dec 3: 3, Dec 4: 4, Dec 5: 3, Dec 6: 2, Dec 7: 3, Dec 8: 1
+INFO:root:Val split - Dec 2: 0, Dec 3: 2, Dec 4: 1, Dec 5: 1, Dec 6: 0, Dec 7: 0, Dec 8: 1
+INFO:root:Test split - Dec 2: 0, Dec 3: 3, Dec 4: 2, Dec 5: 0, Dec 6: 0, Dec 7: 0, Dec 8: 0
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Including one-hot encoding as node features

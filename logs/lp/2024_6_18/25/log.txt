@@ -1,0 +1,53 @@
+INFO:root:Using: cpu
+INFO:root:Using seed 1234.
+INFO:root:Use Super Node : False
+INFO:root:Use Batch Learning : True
+INFO:root:Use Margin Loss : True
+INFO:root:Use Cortical Thickness: False
+INFO:root:Use Myelination : False
+INFO:root:Step Size for Reduction Factor (Gamma) for learning rate : None
+INFO:root:Reduction Factor (Gamma) for learning rate : 0.5
+INFO:root:Train split - Dec 2: 4, Dec 3: 3, Dec 4: 4, Dec 5: 3, Dec 6: 2, Dec 7: 3, Dec 8: 1
+INFO:root:Val split - Dec 2: 0, Dec 3: 2, Dec 4: 1, Dec 5: 1, Dec 6: 0, Dec 7: 0, Dec 8: 1
+INFO:root:Test split - Dec 2: 0, Dec 3: 3, Dec 4: 2, Dec 5: 0, Dec 6: 0, Dec 7: 0, Dec 8: 0
+INFO:root:Using PLV Threshold : 0.3598
+INFO:root:Including one-hot encoding as node features
+INFO:root:LPModel(
+  (manifold): Lorentz manifold
+  (encoder): HyboNet(
+    (manifold): Lorentz manifold
+    (layers): Sequential(
+      (0): LorentzGraphConvolution(
+        (linear): LorentzLinear(
+          (manifold): Lorentz manifold
+          (weight): Linear(in_features=361, out_features=24, bias=True)
+          (dropout): Dropout(p=0.25, inplace=False)
+        )
+        (agg): LorentzAgg(
+          (manifold): Lorentz manifold
+        )
+      )
+      (1): LorentzGraphConvolution(
+        (linear): LorentzLinear(
+          (manifold): Lorentz manifold
+          (weight): Linear(in_features=24, out_features=3, bias=True)
+          (dropout): Dropout(p=0.25, inplace=False)
+        )
+        (agg): LorentzAgg(
+          (manifold): Lorentz manifold
+        )
+      )
+    )
+  )
+  (dc): FermiDiracDecoder()
+  (loss): MarginLoss()
+)
+INFO:root:Number of Train Graph Data Dicts in List: 20
+INFO:root:Number of Validation Graph Data Dicts in List: 5
+INFO:root:Number of Test Graph Data Dicts in List: 5
+INFO:root:Train Subject Indices [34, 305, 15, 8, 169, 287, 123, 377, 180, 307, 384, 577, 491, 186, 219, 13, 494, 472, 132, 197]
+INFO:root:Validation Subject Indices [536, 91, 103, 171, 263]
+INFO:root:Test Subject Indices [88, 109, 150, 128, 190]
+INFO:root:Total number of parameters: 8767.0
+INFO:root:Max Number of Epochs : 150
+INFO:root:Using batch learning index to embeddings dict for training
